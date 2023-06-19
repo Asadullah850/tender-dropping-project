@@ -6,9 +6,11 @@ import {
 } from "react-router-dom";
 import "./index.css";
 import App from "./App";
-import AddPost from "./Components/AddPost";
-import ProductBitBoard from "./Components/ProductBitBoard";
-import TenderDropperPage from "./Components/TenderDropperPage";
+import AddPost from "./Components/Seller/AddPost";
+import ProductBitBoard from "./Components/Bayer/ProductBitBoard";
+import TenderDropperPage from "./Components/Bayer/TenderDropperPage";
+import Dashboard from "./Components/Dashboard";
+import BayerReport from "./Components/Bayer/BayerReport";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +19,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <AddPost />,
+        element: <Dashboard />,
       },
       {
         path: "/bitBoard",
@@ -26,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/caller",
         element: <TenderDropperPage />,
+      },
+      {
+        path: "/bayerreport",
+        element: <BayerReport />,
       },
     ],
   },
