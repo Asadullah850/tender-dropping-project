@@ -10,7 +10,7 @@ import AddPost from "./Components/Seller/AddPost";
 import ProductBitBoard from "./Components/Bayer/ProductBitBoard";
 import TenderDropperPage from "./Components/Bayer/TenderDropperPage";
 import Dashboard from "./Components/Dashboard";
-import BayerReport from "./Components/Bayer/BayerReport";
+import SellerReport from "./Components/Seller/SellerReport";
 
 const router = createBrowserRouter([
   {
@@ -26,12 +26,8 @@ const router = createBrowserRouter([
         element: <ProductBitBoard />,
       },
       {
-        path: "/caller",
-        element: <TenderDropperPage />,
-      },
-      {
-        path: "/bayerreport",
-        element: <BayerReport />,
+        path: "/sellerreport",
+        element: <SellerReport />,
       },
     ],
   },
