@@ -3,6 +3,7 @@ import Pagetitle from './Pagetitle';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEdit } from "react-icons/fa";
 
 
 
@@ -12,16 +13,21 @@ const Dashboard = () => {
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [seeProduct, setseeProduct] = useState(false);
-    const [roll, setRoll] = useState('bitStart')
+    const [roll, setRoll] = useState('bitStop')
     const navigate = useNavigate();
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
         const product = data.ProductName
         const status = roll;
+        const price = data.price
+        const date = new Date()
+        if (price < 0) {
+            return toast.warning(' price les den 1 not accepted')
+        }
         setSellNow(false)
         setseeProduct(true)
-        console.log(status, 'Product Name :', product)
+        console.log(status, product, price, date)
         // toast.success("Successful Add Product!", {
         //     position: toast.POSITION.TOP_CENTER
         // });
@@ -57,11 +63,13 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className=" mx-4 text-left">
+                            <Link>
+                                <FaEdit></FaEdit>
+                            </Link>
                             <p>Company : Iponik Dampodf</p>
                             <p>Name: Iponik Dampo</p>
                             <p>Phone:12345678912</p>
-                            <p>Status: Seller</p>
-                            <p>Code : S5484</p>
+                            <p>Status: Seller / Code : S5484</p>
                         </div>
                     </div>
                     :
@@ -82,20 +90,20 @@ const Dashboard = () => {
                 seller ?
                     // bayer section 
                     <div className="mt-5">
-                        <button onClick={handelSellButton} className="btn max-sm:btn-sm btn-info">
+                        <button onClick={handelSellButton} className="btn btn-sm btn-info">
                             {
                                 sellNow ? 'Not now ' : 'Sell now'
                             }
                         </button>
                         <Link to={'/sellerreport'}>
-                            <button className="mx-2 max-sm:btn-sm  btn btn-success">Report</button>
+                            <button className="mx-2 btn-sm  btn btn-success">Report</button>
                         </Link>
                         {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
-                        <button className="btn  max-sm:btn-sm btn-error">Help</button>
+                        <button className="btn btn-sm btn-error">Help</button>
                     </div>
                     :
-                    
-                   <button className='btn btn-sm btn-secondary'>Lets Bit</button>
+
+                    <button className='btn btn-sm btn-secondary'>Lets Bit</button>
             }
             {/*  */}
             {
@@ -103,6 +111,7 @@ const Dashboard = () => {
                     <form className='my-4 max-sm:w-[97%]' onSubmit={handelEditSubmit}>
                         <label className=' max-sm:text-sm'>Product Name</label>
                         <input className='mx-2 p-2 rounded-lg text-black' type="text" placeholder="Product name" {...register("ProductName", { required: true })} />
+                        <input className='mx-1 p-2 w-20 rounded-lg text-black' type="number" placeholder="Price" defaultValue={0} {...register("price")} />
                         <input className='btn btn-primary bg-[#10227c] hover:bg-[#21A4F1]' type="submit" value={'Edit'} />
                         {errors.ProductName?.type === "required" && (
                             <p role="alert">Product name is required</p>
@@ -116,6 +125,7 @@ const Dashboard = () => {
                     <form className='my-4 max-sm:w-[97%]' onSubmit={handleSubmit(onSubmit)}>
                         <label className=' max-sm:text-sm'>Product Name</label>
                         <input className='mx-2 p-2 rounded-lg text-black' type="text" placeholder="Product name" {...register("ProductName", { required: true })} />
+                        <input className='mx-1 p-2 w-20 rounded-lg text-black' type="number" placeholder="Price" defaultValue={0} {...register("price")} />
                         <input className='btn btn-primary bg-[#10227c] hover:bg-[#21A4F1]' type="submit" value={'Add'} />
                         {errors.ProductName?.type === "required" && (
                             <p role="alert">Product name is required</p>
@@ -131,6 +141,9 @@ const Dashboard = () => {
                                     <tr>
                                         <td>
                                             <div className="text-sm opacity-50">United States Bangari mal shob</div>
+                                        </td>
+                                        <td>
+                                            <div className="text-sm">1520</div>
                                         </td>
                                         <th>
                                             <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
@@ -157,6 +170,9 @@ const Dashboard = () => {
                                     <td>
                                         <div className="text-sm opacity-50">United States Bangari mal shob</div>
                                     </td>
+                                    <td>
+                                        <div className="text-sm">1520</div>
+                                    </td>
                                     <th>
                                         <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
                                         <Link to={'/bitBoard'}>
@@ -170,72 +186,70 @@ const Dashboard = () => {
                     :
                     ''
             }
-            {/*  */}
-   
-            {/*  */}
             {
-                seller ? 
-                <div className=" lg:w-[60%] mx-auto mt-4">
-                <div className="overflow-x-auto">
-                    <p className='text-xl font-semibold underline'>Top 3 Winner</p>
-                    <table className="table">
-                        <tbody>
-                            {/* row 1 */}
-                            <tr>
-                                <th>1</th>
-                                <td>Cy Export Shart</td>
-                                <td>1500</td>
-                                <td>betonaear</td>
-                            </tr>
-                            {/* row 2 */}
-                            <tr>
-                                <th>2</th>
-                                <td>CXRy Export Shart</td>
-                                <td>2200</td>
-                                <td>Pelo</td>
-                            </tr>
-                            {/* row 3 */}
-                            <tr>
-                                <th>3</th>
-                                <td>2RTY Export Shart</td>
-                                <td>1000</td>
-                                <td>Rambi</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            :
-            <div className=" lg:w-[60%] mx-auto mt-4">
-                <div className="overflow-x-auto">
-                    <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner</samp></p>
-                    <table className="table">
-                        <tbody>
-                            {/* row 1 */}
-                            <tr>
-                                <th>1</th>
-                                <td>Cy Export Shart</td>
-                                <td>1500</td>
-                               
-                            </tr>
-                            {/* row 2 */}
-                            <tr>
-                                <th>2</th>
-                                <td>CXRy Export Shart</td>
-                                <td>2200</td>
-                               
-                            </tr>
-                            {/* row 3 */}
-                            <tr>
-                                <th>3</th>
-                                <td>2RTY Export Shart</td>
-                                <td>1000</td>
-                               
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                seller ?
+                    <div className=" lg:w-[60%] mx-auto mt-4">
+                        <div className="overflow-x-auto">
+                            <p className='text-xl font-semibold'>Last 3 Winner</p>
+                            <hr />
+                            <table className="table">
+                                <tbody>
+                                    {/* row 1 */}
+                                    <tr>
+                                        <th>1</th>
+                                        <td>Cy Export Shart</td>
+                                        <td>1500</td>
+                                        <td>betonaear</td>
+                                    </tr>
+                                    {/* row 2 */}
+                                    <tr>
+                                        <th>2</th>
+                                        <td>CXRy Export Shart</td>
+                                        <td>2200</td>
+                                        <td>Pelo</td>
+                                    </tr>
+                                    {/* row 3 */}
+                                    <tr>
+                                        <th>3</th>
+                                        <td>2RTY Export Shart</td>
+                                        <td>1000</td>
+                                        <td>Rambi</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    :
+                    <div className=" lg:w-[60%] mx-auto mt-4">
+                        <div className="overflow-x-auto">
+                            <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner</samp></p>
+                            <table className="table">
+                                <tbody>
+                                    {/* row 1 */}
+                                    <tr>
+                                        <th>1</th>
+                                        <td>Cy Export Shart</td>
+                                        <td>1500</td>
+
+                                    </tr>
+                                    {/* row 2 */}
+                                    <tr>
+                                        <th>2</th>
+                                        <td>CXRy Export Shart</td>
+                                        <td>2200</td>
+
+                                    </tr>
+                                    {/* row 3 */}
+                                    <tr>
+                                        <th>3</th>
+                                        <td>2RTY Export Shart</td>
+                                        <td>1000</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
             }
         </div>
     );

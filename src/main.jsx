@@ -11,6 +11,9 @@ import ProductBitBoard from "./Components/Bayer/ProductBitBoard";
 import TenderDropperPage from "./Components/Bayer/TenderDropperPage";
 import Dashboard from "./Components/Dashboard";
 import SellerReport from "./Components/Seller/SellerReport";
+import EditProfile from "./Components/Seller/EditProfile.";
+import Register from "./Components/Register";
+import Login from "./Components/Login";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +31,18 @@ const router = createBrowserRouter([
       {
         path: "/sellerreport",
         element: <SellerReport />,
+      },
+      {
+        path: "/profileEditSeller",
+        element: <EditProfile />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
       },
     ],
   },

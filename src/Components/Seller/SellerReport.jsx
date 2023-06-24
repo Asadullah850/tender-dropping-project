@@ -1,8 +1,13 @@
-import React from 'react';
 import Pagetitle from '../Pagetitle';
 import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import DatePicker from 'react-date-picker';
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import { FaEdit } from "react-icons/fa";
 
 const SellerReport = () => {
+    const [value, onChange] = useState(new Date());
     return (
         <div className=' text-center'>
             <Pagetitle title={'Seller Report'}></Pagetitle>
@@ -14,20 +19,23 @@ const SellerReport = () => {
                     </div>
                 </div>
                 <div className=" mx-4 text-left">
+                    <Link>
+                        <FaEdit></FaEdit>
+                    </Link>
                     <p>Company : Iponik Dampodf</p>
                     <p>Name: Iponik Dampo</p>
                     <p>Phone:12345678912</p>
-                    <p>Status: Seller</p>
-                    <p>Code : S5484</p>
+                    <p>Status: Seller / Code : S5484</p>
                     <Link to={'/'}>
                         <button className='btn btn-sm btn-accent my-2'>Home</button>
+                        {/* To do add Pdf */}
                     </Link>
                 </div>
             </div>
 
             {/*  */}
             <div className=" lg:w-[60%] mx-auto mt-4">
-                <p className=' text-left'>Date: </p>
+                <p className=' text-left'>Date: <DatePicker className='w-40 bg-violet-500 text-black rounded-md' onChange={onChange} value={value} /> <button className='btn btn-sm btn-success'>Search</button></p>
                 <div className="overflow-x-auto">
                     <table className="table">
                         <thead className=' text-yellow-300'>
