@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Pagetitle from './Pagetitle';
-import GoogleButton from './GoogleButton';
-import { FcGoogle } from "react-icons/fc";
+import GoogleButton from './Share/GoogleButton';
+import { useQuery } from '@tanstack/react-query';
+import useAxios from './Share/useAxios';
 
 const Register = () => {
     const [googleBtn, setGooglebtn] = useState(false)
     const [error, setError] = useState('');
+    const [ instance ] = useAxios()
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
@@ -23,6 +24,10 @@ const Register = () => {
             role, idNumber, name, companyname, phoneNumber, password
         }
         console.log(getData);
+        
+        instance.post(`/users`,getData).then(res =>{
+            console.log(res.data);
+        })
     }
 
     const handelGoogleRoleButt = () => {
@@ -67,7 +72,7 @@ const Register = () => {
                 <p>{error}</p>
                 <input className=' text-black hidden' type="number" defaultValue={0} {...register("code")} />
                 <p className=' text-left p-2 text-lg font-semibold lg:ml-5'>Password</p>
-                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="name" {...register("password", { required: true })} />
+                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="Password" {...register("password", { required: true })} />
                 <input className='btn btn-sm btn-success mt-2' type="submit" />
             </form>
             <GoogleButton></GoogleButton>

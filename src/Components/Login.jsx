@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Pagetitle from './Pagetitle';
-import GoogleButton from './GoogleButton';
+import GoogleButton from './Share/GoogleButton';
 
 
 const Login = () => {

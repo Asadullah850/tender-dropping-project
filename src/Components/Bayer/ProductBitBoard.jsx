@@ -24,7 +24,6 @@ const ProductBitBoard = () => {
             return () => clearInterval(interval);
         }
     }, [seconds]);
-    console.log(seconds);
 
     const handelLock = () => {
         console.log('lock ');
