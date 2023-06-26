@@ -64,10 +64,10 @@ const GoogleButton = () => {
         <>
             {/* Open the modal using ID.showModal() method */}
             {
-                select ? <button htmlFor="my_modal_7" onClick={handelGoogleSingIn} className='btn mt-2 bg-transparent border-none'><FcGoogle className='text-5xl'></FcGoogle></button>
+                select ? <button htmlFor="my_modal_7" onClick={handelGoogleSingIn} className='btn btn-sm mt-2 bg-transparent border-none'><FcGoogle className='text-2xl'></FcGoogle></button>
                     :
 
-                    <label htmlFor="my_modal_7" className="btn"><FcGoogle className='text-5xl'></FcGoogle></label>
+                    <label htmlFor="my_modal_7" className="btn btn-sm mt-2 bg-transparent border-none"><FcGoogle className='text-2xl '></FcGoogle></label>
             }
 
             {/* The button to open modal */}

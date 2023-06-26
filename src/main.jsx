@@ -21,6 +21,8 @@ import SellerReport from "./Components/Seller/SellerReport";
 import EditProfile from "./Components/Seller/EditProfile.";
 import Register from "./Components/Register";
 import Login from "./Components/Login";
+import Authprovider from "./Components/Authntication/Authprovider";
+import PrivetRoute from "./Components/Authntication/PrivetRoute";
 
 const queryClient = new QueryClient()
 
@@ -31,19 +33,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Dashboard />,
+        element: <PrivetRoute><Dashboard /></PrivetRoute>,
       },
       {
         path: "/bitBoard",
-        element: <ProductBitBoard />,
+        element: <PrivetRoute><ProductBitBoard /></PrivetRoute>,
       },
       {
         path: "/sellerreport",
-        element: <SellerReport />,
+        element: <PrivetRoute><SellerReport /></PrivetRoute>,
       },
       {
         path: "/profileEditSeller",
-        element: <EditProfile />,
+        element: <PrivetRoute><EditProfile /></PrivetRoute>,
       },
       {
         path: "/register",
@@ -59,8 +61,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
-    </QueryClientProvider>
+    <Authprovider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </Authprovider>
   </React.StrictMode>
 );
