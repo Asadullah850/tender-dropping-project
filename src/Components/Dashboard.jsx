@@ -4,17 +4,33 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit } from "react-icons/fa";
+import { useQuery } from '@tanstack/react-query';
+import useAuth from './Authntication/useAuth';
+import useAxios from './Share/useAxios';
+import LogOut from './Share/Logout';
 
 
 
 const Dashboard = () => {
-    const seller = true;
+    const [ seller, setSeller] = useState(true)
     const [sellNow, setSellNow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [seeProduct, setseeProduct] = useState(false);
     const [roll, setRoll] = useState('bitStop')
     const navigate = useNavigate();
+    const [ instance ] = useAxios()
+    const { user, logout, loading } = useAuth()
+
+
+    const { data: userDataDB = [], refetch, isLoading} = useQuery(['user'], async () => {
+        const userCheck = await instance.get(`/singleUser/${user?.email}`);
+        console.log(userCheck);
+        return userCheck.data
+    })
+
+    const {companyname, email, idNumber, imgUrl, phoneNumber, role} = userDataDB;
+
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
@@ -49,6 +65,15 @@ const Dashboard = () => {
         setEditForm(false)
         console.log('edit');
     }
+    const singOut = () =>{
+        logout().then((res) => {
+            // Sign-out successful.
+            navigate('/login')
+            console.log(res);
+          }).catch((error) => {
+            // An error happened.
+          });
+    }
     return (
         <div className=' text-center'>
             {
@@ -59,17 +84,18 @@ const Dashboard = () => {
                     <div className=" flex lg:w-[60%] w-[80%] justify-between mx-auto my-2">
                         <div className="avatar">
                             <div className="w-24 rounded-xl">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRarHLf-_lcG7s3YUKLSn6CdqR77v6C1SiZUXYq_vTQH3SwbkKCn956PcsLyuYuWGhzTME&usqp=CAU" />
+                                <img src={imgUrl} />
                             </div>
                         </div>
                         <div className=" mx-4 text-left">
                             <Link>
                                 <FaEdit></FaEdit>
                             </Link>
-                            <p>Company : Iponik Dampodf</p>
-                            <p>Name: Iponik Dampo</p>
-                            <p>Phone:12345678912</p>
-                            <p>Status: Seller / Code : S5484</p>
+                            <p>Company : {companyname}</p>
+                            <p>Name: {name}</p>
+                            <p>Phone: {phoneNumber}</p>
+                            <p>Email: {email}</p>
+                            <p>Status: {role} / Code : {idNumber}</p>
                         </div>
                     </div>
                     :
@@ -99,6 +125,7 @@ const Dashboard = () => {
                             <button className="mx-2 btn-sm  btn btn-success">Report</button>
                         </Link>
                         {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
+                        <button onClick={()=> singOut ()} className='btn btn-sm btn-warning'>Logout</button>
                         <button className="btn btn-sm btn-error">Help</button>
                     </div>
                     :

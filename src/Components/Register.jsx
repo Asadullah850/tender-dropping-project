@@ -5,19 +5,33 @@ import { useQuery } from '@tanstack/react-query';
 import useAxios from './Share/useAxios';
 import useAuth from './Authntication/useAuth';
 import { updateProfile } from 'firebase/auth';
+import { toast } from 'react-toastify';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 
 const Register = () => {
     const [googleBtn, setGooglebtn] = useState(false)
     const [error, setError] = useState('');
     const [userimg, setUserimg] = useState('')
-    const { user, newUser } = useAuth()
+    const navigate = useNavigate();
+    const { user, newUser, loading } = useAuth()
     const [instance] = useAxios()
+    const [previous, setPrevious] = useState([])
 
+    const { data, isLoading, isError } = useQuery(['userData'], async () => {
+        const response = await instance.get('/alluser');
+        setPrevious(response.data)
+        return response.data;
+    });
+
+    const filter = previous.slice(0, 1).map(item => item.idNumber)
+    const id = filter[0]
+    // console.log(id+1);
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
-    const img_hosting_url =`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_Image_Token_Api}`
+    const img_hosting_url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_Image_Token_Api}`
+
     const onSubmit = data => {
         const role = data.status
         const companyname = data.companyname
@@ -26,57 +40,52 @@ const Register = () => {
         const password = data.password
         const email = data.email
         // image upload
-        // const img = data.image
-        const fromData = new FormData()
-        fromData.append('image', data.image[0])
-
-        fetch(img_hosting_url,{
-            method: "POST",
-            body: fromData
-        }).then(res => res.json())
-        .then(imgResponse => {
-            const imgUrl = imgResponse.data.display_url
-            setUserimg(imgUrl)
-            console.log(imgResponse);
-        })
-        // image upload
-
-        const idNumber = parseInt(data.code)
+        const idNumber = id + 1;
         if (role == 'select') {
             return setError('Pleas Select Your Role')
         }
-        const getData = {
-            role, idNumber, name, companyname, phoneNumber, password, email
-        }
-        console.log(data, userimg);
 
-        newUser(email, password)
-            .then((userCredential) => {
-                // Signed in 
-                const getUser = userCredential.user;
-                updateProfile(getUser, {
-                    displayName: name, photoURL: userimg
-                }).then(() => {
-                    // Profile updated!
+        const fromData = new FormData()
+        fromData.append('image', data.image[0])
+        fetch(img_hosting_url, {
+            method: "POST",
+            body: fromData
+        }).then(res => res.json()).then(imgResponse => {
+            const imgUrl = imgResponse.data.display_url
+            newUser(email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const getUser = userCredential.user;
+                    updateProfile(getUser, {
+                        displayName: name, photoURL: imgUrl
+                    }).then(() => {
+                        // Profile updated!
+                        // ...
+                    }).catch((error) => {
+                        // An error occurred
+                        // ...
+                    });
+                    const getData = {
+                        role, idNumber, name, companyname, phoneNumber, email, imgUrl
+                    }
+                    instance.post(`/users`, getData).then(res => {
+                        // console.log("res.data",res.data, "data",data);
+                        if (res.data.acknowledged) {
+                            toast.success("Account Successful")
+                        }
+                        navigate('/')
+                    })
+                    console.log(getData);
                     // ...
-                }).catch((error) => {
-                    // An error occurred
-                    // ...
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    toast.warning(errorMessage)
+                    console.log(errorMessage);
+                    // ..
                 });
-                console.log(getUser);
-                // ...
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorMessage);
-                // ..
-            });
-
-        // instance.post(`/users`,getData).then(res =>{
-        //     console.log(res.data);
-        // })
-
+        })
     }
 
     const handelGoogleRoleButt = () => {
@@ -95,7 +104,7 @@ const Register = () => {
 
     return (
         <div className='text-center mx-10'>
-            <h1 className=' text-xl mt-4'>Register</h1>
+            <h1 className=' text-xl my-2 pt-5'>Register</h1>
             <form className='lg:w-[60%] mx-auto my-2' onSubmit={handleSubmit(onSubmit)}>
                 <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Company Name</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="Company Name" {...register("companyname", { required: true })} />
@@ -122,7 +131,7 @@ const Register = () => {
                 <div className=" flex gap-4 my-2">
                     <div className="">
                         <label>Your Image File
-                            <input type="file" accept="image/*" {...register("image")}/>
+                            <input type="file" accept="image/*" {...register("image")} />
                         </label>
                     </div>
                     <div className="">
@@ -135,9 +144,9 @@ const Register = () => {
                     </div>
                 </div>
 
-                <input className=' text-black hidden' type="number" defaultValue={0} {...register("code")} />
+                {/* <input className=' text-black hidden' type="number" defaultValue={} {...register("code")} /> */}
                 <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Password</p>
-                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" {...register("password", {
+                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="password" {...register("password", {
                     required: true,
                     min: 8,
                     maxLength: 20,
@@ -148,6 +157,13 @@ const Register = () => {
                 {errors.password?.type === 'min' && <p className='text-white p-0' role="alert">Password is upper 8</p>}
                 {errors.password?.type === 'maxLength' && <p className='text-white p-0' role="alert">Password is less then 20</p>}
                 {errors.password?.type === 'pattern' && <p className='text-white p-0' role="alert">Password are pattern (Aa123@.com)</p>}
+                <div className='text-left'>
+                    <Link to={'/login'}>
+                        <small className=''>Have Account</small>
+                    </Link>
+                </div>
+                <br />
+                <p>123@Aaaa</p>
                 <input className='btn btn-sm btn-success mt-2' type="submit" />
             </form>
             <GoogleButton></GoogleButton>

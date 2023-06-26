@@ -37,7 +37,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/bitBoard",
-        element: <PrivetRoute><ProductBitBoard /></PrivetRoute>,
+        element: <ProductBitBoard />,
       },
       {
         path: "/sellerreport",
