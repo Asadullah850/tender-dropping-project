@@ -106,35 +106,43 @@ const Register = () => {
         <div className='text-center mx-10'>
             <h1 className=' text-xl my-2 pt-5'>Register</h1>
             <form className='lg:w-[60%] mx-auto my-2' onSubmit={handleSubmit(onSubmit)}>
-                <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Company Name</p>
+                <p className=' text-left mt-1  text-lg font-semibold lg:ml-7'>Company Name</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="Company Name" {...register("companyname", { required: true })} />
                 {errors.companyname?.type === "required" && (
                     <p role="alert">Company Name is required</p>
                 )}
-                <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Your Name</p>
+                <p className=' text-left mt-1 text-lg font-semibold lg:ml-7'>Your Name</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="name" {...register("name", { required: true })} />
                 {errors.name?.type === "required" && (
                     <p role="alert">Name is required</p>
                 )}
-                <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Phone Number</p>
+                <p className=' text-left mt-1 text-lg font-semibold lg:ml-7'>Phone Number</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="name" {...register("phoneNumber", { required: true })} />
                 {errors.phoneNumber?.type === "required" && (
                     <p role="alert">Phone Number is required</p>
                 )}
 
-                <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Your Email</p>
+                <p className=' text-left mt-1 text-lg font-semibold lg:ml-7'>Your Email</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="email" placeholder="email@email.com" {...register("email", { required: true })} />
                 {errors.email?.type === "required" && (
                     <p role="alert">Email is required</p>
                 )}
 
-                <div className=" flex gap-4 my-2">
-                    <div className="">
-                        <label>Your Image File
-                            <input type="file" accept="image/*" {...register("image")} />
+                <div className=" flex gap-4 my-2 lg:mx-7">
+                    <div className=" text-left">
+                        {/* <label className="label">
+                            <span className="label-text text-white">Pick Your Small Image</span>
+                        </label> */}
+                        <label htmlFor="file-upload" className="file-input-label text-left">
+                        Pick Your Small Image
                         </label>
+                        <input type="file"  accept="image/*" {...register("image")} className="file-input file-input-bordered file-input-primary w-full h-10 text-black max-w-xs" />
+               
                     </div>
                     <div className="">
+                        <label className="label">
+                            <span className="label-text text-white">Select Your Role</span>
+                        </label>
                         <select className=' text-black w-full p-1 rounded-md font-semibold' {...register("status", { required: true })}>
                             <option className=' text-black/50 disabled cursor-not-allowed' value="select">Select Your Role</option>
                             <option value="bayer"> Bayer</option>
@@ -145,7 +153,7 @@ const Register = () => {
                 </div>
 
                 {/* <input className=' text-black hidden' type="number" defaultValue={} {...register("code")} /> */}
-                <p className=' text-left mt-1 text-lg font-semibold lg:ml-5'>Password</p>
+                <p className=' text-left mt-1 text-lg font-semibold lg:ml-7'>Password</p>
                 <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="password" {...register("password", {
                     required: true,
                     min: 8,
@@ -157,12 +165,12 @@ const Register = () => {
                 {errors.password?.type === 'min' && <p className='text-white p-0' role="alert">Password is upper 8</p>}
                 {errors.password?.type === 'maxLength' && <p className='text-white p-0' role="alert">Password is less then 20</p>}
                 {errors.password?.type === 'pattern' && <p className='text-white p-0' role="alert">Password are pattern (Aa123@.com)</p>}
-                <div className='text-left'>
+                <div className='text-left lg:mx-7'>
                     <Link to={'/login'}>
                         <small className=''>Have Account</small>
                     </Link>
                 </div>
-                <br />
+                {/* to do have accoun possing change */}
                 <p>123@Aaaa</p>
                 <input className='btn btn-sm btn-success mt-2' type="submit" />
             </form>
