@@ -8,51 +8,58 @@ import { useQuery } from '@tanstack/react-query';
 import useAuth from './Authntication/useAuth';
 import useAxios from './Share/useAxios';
 import LogOut from './Share/Logout';
+import axios from 'axios';
 
 
 
 const Dashboard = () => {
-    const [ seller, setSeller] = useState(true)
+    const [seller, setSeller] = useState(true);
+    const [bitStart, setBitStart] = useState(false);
+    const [productName, setPName] = useState('');
+    const [productPrice, setPPrice] = useState('');
     const [sellNow, setSellNow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [seeProduct, setseeProduct] = useState(false);
     const [roll, setRoll] = useState('bitStop')
     const navigate = useNavigate();
-    const [ instance ] = useAxios()
-    const { user, logout, loading } = useAuth()
+    const [instance] = useAxios();
+    const { user, logout, loading } = useAuth();
 
 
-    const { data: userDataDB = [], refetch, isLoading} = useQuery(['user'], async () => {
+    const { data: userDataDB = [], refetch, isLoading } = useQuery(['user'], async () => {
         const userCheck = await instance.get(`/singleUser/${user?.email}`);
-        console.log(userCheck);
+        // console.log(userCheck);
         return userCheck.data
     })
 
-    const {companyname, email, idNumber, imgUrl, phoneNumber, role} = userDataDB;
-
+    const { companyname, email, idNumber, imgUrl, phoneNumber, role, name,_id } = userDataDB;
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
         const product = data.ProductName
         const status = roll;
-        const price = data.price
+        const price = parseFloat(data.price)
         const date = new Date()
+        const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         if (price < 0) {
             return toast.warning(' price les den 1 not accepted')
         }
+        const setProduct = {
+            status, product, price, postDate
+        }
+        setPName(product)
+        setPPrice(price)
         setSellNow(false)
         setseeProduct(true)
-        console.log(status, product, price, date)
-        // toast.success("Successful Add Product!", {
-        //     position: toast.POSITION.TOP_CENTER
-        // });
-        // navigate('/bitBoard')
+        console.log(setProduct)
+
 
     };
     // console.log(edit);
     const handelSellButton = () => {
-        setSellNow(!sellNow)
+
+        setSellNow(true)
     }
     const handelEdit = () => {
         setEditForm(true)
@@ -61,41 +68,95 @@ const Dashboard = () => {
     }
     const handelEditSubmit = (event) => {
         event.preventDefault()
+        const form = event.target
+        const productName = form.ProductName.value;
+        const productPrice = form.price.value;
+        const updateProduct = {
+            productName, productPrice
+        }
+        console.log(updateProduct);
+        setPName(productName)
+        setPPrice(productPrice)
         setEdit(true)
         setEditForm(false)
-        console.log('edit');
     }
-    const singOut = () =>{
+    const singOut = () => {
         logout().then((res) => {
             // Sign-out successful.
             navigate('/login')
             console.log(res);
-          }).catch((error) => {
+        }).catch((error) => {
             // An error happened.
-          });
+        });
     }
+
+
+    const bitOn = async ()=> {
+        const pName = productName;
+        const pPrice = productPrice;
+        const collection = { pName, pPrice}
+        console.log("collection", collection);
+    //    const response = await instance.post(`productName`,{collection});
+    //    console.log(response.data)
+        
+    }
+    // const bitcode = async ()=>{
+    //     const randomCode = Math.floor(Math.random()*99999) + 10000;
+    //     const codeData =  await instance.patch(`/codeUpdate/${_id}`, {randomCode})
+    //     console.log(randomCode, codeData);
+    //     setBitStart(true)
+    //     setError('')
+    // }
+
     return (
         <div className=' text-center'>
             {
-                seller ? <Pagetitle title={`Seller Dashboard `}></Pagetitle> : <Pagetitle title={`Bayer Dashboard `}></Pagetitle>
+                // role dea seller chacke kora 
+                role === 'seller' ? <Pagetitle title={`Seller Dashboard `}></Pagetitle> : <Pagetitle title={`Bayer Dashboard `}></Pagetitle>
             }
             {
-                seller ?
+                role === 'seller' ?
                     <div className=" flex lg:w-[60%] w-[80%] justify-between mx-auto my-2">
                         <div className="avatar">
                             <div className="w-24 rounded-xl">
                                 <img src={imgUrl} />
                             </div>
                         </div>
+{/* edit */}
                         <div className=" mx-4 text-left">
-                            <Link>
-                                <FaEdit></FaEdit>
-                            </Link>
+                            {/* Open the modal using ID.showModal() method */}
+                            <button className="btn btn-sm bg-transparent p-0 border-none hover:bg-transparent" onClick={() => window.my_modal_5.showModal()}><FaEdit className=' text-white text-lg '></FaEdit></button>
+                            <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+                                <form method="dialog" className="modal-box">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-bold text-lg">Edit!</h3>
+                                        <p>Code : {idNumber}</p>
+                                    </div>
+                                    <div className=" flex">
+                                        <div className="">
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={companyname} />
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="tel" defaultValue={phoneNumber} />
+                                        </div>
+                                        <div className="">
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={name} />
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="url" defaultValue={imgUrl} />
+                                        </div>
+                                    </div>
+                                    <div className="modal-action">
+                                        {/* if there is a button in form, it will close the modal */}
+                                        {/* To DO akhane edit button a kaj ace */}
+                                        <button className="btn border-2 border-black">Submit</button>
+                                    </div>
+                                </form>
+                            </dialog>
+
+{/* edit */}
                             <p>Company : {companyname}</p>
                             <p>Name: {name}</p>
                             <p>Phone: {phoneNumber}</p>
                             <p>Email: {email}</p>
-                            <p>Status: {role} / Code : {idNumber}</p>
+                            <p>Status: <span className=' uppercase'>{role}</span> / Code : 45458 </p>
+                            {/* to do akhane jwt wuse korty hobe */}
                         </div>
                     </div>
                     :
@@ -113,10 +174,10 @@ const Dashboard = () => {
                     </div>
             }
             {
-                seller ?
-                    // bayer section 
+                role === 'seller' ?
+                    // seller section 
                     <div className="mt-5">
-                        <button onClick={handelSellButton} className="btn btn-sm btn-info">
+                        <button onClick={handelSellButton} className={ sellNow ? `btn btn-sm btn-info` : `btn btn-sm btn-info` }>
                             {
                                 sellNow ? 'Not now ' : 'Sell now'
                             }
@@ -125,8 +186,8 @@ const Dashboard = () => {
                             <button className="mx-2 btn-sm  btn btn-success">Report</button>
                         </Link>
                         {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
-                        <button onClick={()=> singOut ()} className='btn btn-sm btn-warning'>Logout</button>
-                        <button className="btn btn-sm btn-error">Help</button>
+                        <button onClick={() => singOut()} className='btn btn-sm btn-warning'>Logout</button>
+                        <button className="btn btn-sm btn-error mx-2">Help</button>
                     </div>
                     :
 
@@ -146,12 +207,11 @@ const Dashboard = () => {
                     </form>
                     : ''
             }
-
             {
                 sellNow ?
                     <form className='my-4 max-sm:w-[97%]' onSubmit={handleSubmit(onSubmit)}>
                         <label className=' max-sm:text-sm'>Product Name</label>
-                        <input className='mx-2 p-2 rounded-lg text-black' type="text" placeholder="Product name" {...register("ProductName", { required: true })} />
+                        <input className='mx-2 p-2 rounded-lg text-black' type="text" placeholder="Product Name" {...register("ProductName", { required: true })} />
                         <input className='mx-1 p-2 w-20 rounded-lg text-black' type="number" placeholder="Price" defaultValue={0} {...register("price")} />
                         <input className='btn btn-primary bg-[#10227c] hover:bg-[#21A4F1]' type="submit" value={'Add'} />
                         {errors.ProductName?.type === "required" && (
@@ -159,7 +219,7 @@ const Dashboard = () => {
                         )}
                     </form>
                     :
-                    edit ?
+                    edit  && editForm === false ?
                         <div className="overflow-x-auto lg:w-[60%] mx-auto mt-4">
                             <table className="table">
                                 {/* head */}
@@ -167,10 +227,10 @@ const Dashboard = () => {
                                     {/* row 1 */}
                                     <tr>
                                         <td>
-                                            <div className="text-sm opacity-50">United States Bangari mal shob</div>
+                                            <div className="text-sm opacity-50">{productName}</div>
                                         </td>
                                         <td>
-                                            <div className="text-sm">1520</div>
+                                            <div className="text-sm">{productPrice}</div>
                                         </td>
                                         <th>
                                             <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
@@ -195,15 +255,15 @@ const Dashboard = () => {
                                 {/* row 1 */}
                                 <tr>
                                     <td>
-                                        <div className="text-sm opacity-50">United States Bangari mal shob</div>
+                                        <div className="text-sm opacity-50">{productName}</div>
                                     </td>
                                     <td>
-                                        <div className="text-sm">1520</div>
+                                        <div className="text-sm">{productPrice}</div>
                                     </td>
                                     <th>
                                         <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
                                         <Link to={'/bitBoard'}>
-                                            <button className="btn btn-accent btn-xs">Bit Start</button>
+                                            <button onClick={bitOn} className="btn btn-accent btn-xs">Start</button>
                                         </Link>
                                     </th>
                                 </tr>
@@ -214,7 +274,7 @@ const Dashboard = () => {
                     ''
             }
             {
-                seller ?
+                role === 'seller' ?
                     <div className=" lg:w-[60%] mx-auto mt-4">
                         <div className="overflow-x-auto">
                             <p className='text-xl font-semibold'>Last 3 Winner</p>

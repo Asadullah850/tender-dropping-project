@@ -39,6 +39,7 @@ const Register = () => {
         const phoneNumber = data.phoneNumber
         const password = data.password
         const email = data.email
+        const bitCode = 0;
         // image upload
         const idNumber = id + 1;
         if (role == 'select') {
@@ -66,7 +67,7 @@ const Register = () => {
                         // ...
                     });
                     const getData = {
-                        role, idNumber, name, companyname, phoneNumber, email, imgUrl
+                        role, idNumber, name, companyname, phoneNumber, email, imgUrl, bitCode
                     }
                     instance.post(`/users`, getData).then(res => {
                         // console.log("res.data",res.data, "data",data);
@@ -117,7 +118,7 @@ const Register = () => {
                     <p role="alert">Name is required</p>
                 )}
                 <p className=' text-left mt-1 text-lg font-semibold lg:ml-7'>Phone Number</p>
-                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="text" placeholder="name" {...register("phoneNumber", { required: true })} />
+                <input className=' text-black w-full lg:w-[90%] p-1 rounded-md font-semibold' type="tel" placeholder="name" {...register("phoneNumber", { required: true })} />
                 {errors.phoneNumber?.type === "required" && (
                     <p role="alert">Phone Number is required</p>
                 )}
