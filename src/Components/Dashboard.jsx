@@ -17,6 +17,7 @@ const Dashboard = () => {
     const [bitStart, setBitStart] = useState(false);
     const [productName, setPName] = useState('');
     const [productPrice, setPPrice] = useState('');
+    const [productData, setProductData] = useState('');
     const [sellNow, setSellNow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState(false);
@@ -26,6 +27,31 @@ const Dashboard = () => {
     const [instance] = useAxios();
     const { user, logout, loading } = useAuth();
 
+    function generateRandomString() {
+        var randomString = '';
+        var uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+        var numbers = '0123456789';
+      
+      
+        for (var j = 0; j < 8; j++) {
+          randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+        }
+      
+        for (var k = 0; k < 30; k++) {
+          randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        }
+      
+        for (var l = 0; l < 8; l++) {
+          randomString += lowercaseLetters.charAt(Math.floor(Math.random() * lowercaseLetters.length));
+        }
+      
+        for (var m = 0; m < 10; m++) {
+          randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        }
+      
+        return randomString.trim();
+      }
 
     const { data: userDataDB = [], refetch, isLoading } = useQuery(['user'], async () => {
         const userCheck = await instance.get(`/singleUser/${user?.email}`);
@@ -33,25 +59,38 @@ const Dashboard = () => {
         return userCheck.data
     })
 
+
     const { companyname, email, idNumber, imgUrl, phoneNumber, role, name,_id } = userDataDB;
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
         const product = data.ProductName
         const status = roll;
+        const code = generateRandomString()
+        const checkCode = instance.get(`/checkCode/${code}`)
+        console.log(checkCode);
+        if (checkCode === null) {
+            checkCode = 0;
+        }
+        if (checkCode == code) {
+            return code
+        }
+        console.log(checkCode);
         const price = parseFloat(data.price)
         const date = new Date()
         const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         if (price < 0) {
-            return toast.warning(' price les den 1 not accepted')
+            return toast.warning(' price les den 0 not accepted')
         }
         const setProduct = {
-            status, product, price, postDate
+            status, product, price, postDate, code
         }
+
         setPName(product)
         setPPrice(price)
         setSellNow(false)
         setseeProduct(true)
+        setProductData(setProduct)
         console.log(setProduct)
 
 
@@ -71,12 +110,20 @@ const Dashboard = () => {
         const form = event.target
         const productName = form.ProductName.value;
         const productPrice = form.price.value;
-        const updateProduct = {
-            productName, productPrice
+        const date = new Date()
+        const status = "bitStart";
+        const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        if (productPrice < 0) {
+            return toast.warning(' price les den 1 not accepted')
         }
+        const updateProduct = {
+            productName, productPrice, postDate, status
+        }
+
         console.log(updateProduct);
         setPName(productName)
         setPPrice(productPrice)
+        setProductData(updateProduct)
         setEdit(true)
         setEditForm(false)
     }
@@ -90,17 +137,34 @@ const Dashboard = () => {
         });
     }
 
+    
+    
+      
+    //   var randomString = generateRandomString();
+    //   console.log(randomString);
 
-    const bitOn = async ()=> {
+    const bitOn = ()=> {
         const pName = productName;
         const pPrice = productPrice;
-        const collection = { pName, pPrice}
+        // To do user code
+        const code = userDataDB.idNumber;
+        const email = user.email;
+        const status = "bitStart";
+        // const randomCode = Math.floor(Math.random()*99999) + 10000;
+        // const randomCode = generateRandomString()
+        // const { data: productCode = [], refetch, isLoading } = useQuery(['code'], async () => {
+        //     const userCheck = await instance.get(`/`);
+        //     // console.log(userCheck);
+        //     return userCheck.data
+        // })
+        const collection = { pName, pPrice, code, email, status, randomCode}
         console.log("collection", collection);
-    //    const response = await instance.post(`productName`,{collection});
-    //    console.log(response.data)
+        console.log(productData);
+    //    const response = await instance.post(`productName`,collection);
+    //    console.log(response)
         
     }
-    // const bitcode = async ()=>{
+    // const bitcode =  ()=>{
     //     const randomCode = Math.floor(Math.random()*99999) + 10000;
     //     const codeData =  await instance.patch(`/codeUpdate/${_id}`, {randomCode})
     //     console.log(randomCode, codeData);
@@ -235,7 +299,7 @@ const Dashboard = () => {
                                         <th>
                                             <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
                                             <Link to={'/bitBoard'}>
-                                                <button className="btn btn-accent btn-xs">Bit Start</button>
+                                                <button onClick={bitOn} className="btn btn-accent btn-xs">Bit Start</button>
                                             </Link>
                                         </th>
                                     </tr>
