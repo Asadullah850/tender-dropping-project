@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import GoogleButton from './Share/GoogleButton';
 import { useQuery } from '@tanstack/react-query';
 import useAxios from './Share/useAxios';
 import useAuth from './Authntication/useAuth';
 import { updateProfile } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import generateRandomString from './Utilits/bitCodeGenerat';
 
 
 const Register = () => {
@@ -39,7 +39,7 @@ const Register = () => {
         const phoneNumber = data.phoneNumber
         const password = data.password
         const email = data.email
-        const bitCode = 0;
+        const bitCode = generateRandomString();
         // image upload
         const idNumber = id + 1;
         if (role == 'select') {
@@ -175,7 +175,6 @@ const Register = () => {
                 <p>123@Aaaa</p>
                 <input className='btn btn-sm btn-success mt-2' type="submit" />
             </form>
-            <GoogleButton></GoogleButton>
         </div>
     );
 };

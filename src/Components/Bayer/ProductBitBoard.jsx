@@ -1,9 +1,24 @@
+import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import useAxios from '../Share/useAxios';
 
 const ProductBitBoard = () => {
     const [seconds, setSeconds] = useState(0);
     const [minute, setMinute] = useState(0)
+    const params = useParams();
+    const [instance] = useAxios();
+
+
+    const pCode = params.bitBoard;
+    
+    // console.log(params.bitBoard);
+    const { data: singlePData = [], refetch, isLoading } = useQuery(['productCode'], async () => {
+        const product = await instance.get(`/singleProduct/${pCode}`);
+        // console.log(product.data);
+        return product.data
+    })
+console.log(singlePData.product);
 
     useEffect(() => {
         if (minute <= 5) {
@@ -38,7 +53,7 @@ const ProductBitBoard = () => {
 
     return (
         <div className=' text-center'>
-            <p className=' my-4'>Product Name: XCRZ Car</p>
+            <p className=' my-4'>Product Name: {singlePData.product} | {singlePData.code}</p>
             <div className=" divider"></div>
             <div className="my-4 ">
                 <p className=' text-right w-[80%]'>

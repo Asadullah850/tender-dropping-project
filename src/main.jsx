@@ -13,7 +13,6 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import App from "./App";
-import AddPost from "./Components/Seller/AddPost";
 import ProductBitBoard from "./Components/Bayer/ProductBitBoard";
 import TenderDropperPage from "./Components/Bayer/TenderDropperPage";
 import Dashboard from "./Components/Dashboard";
@@ -36,7 +35,7 @@ const router = createBrowserRouter([
         element: <PrivetRoute><Dashboard /></PrivetRoute>,
       },
       {
-        path: "/bitBoard",
+        path: "/bitBoard/:bitBoard",
         element: <ProductBitBoard />,
       },
       {
@@ -46,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "/profileEditSeller",
         element: <PrivetRoute><EditProfile /></PrivetRoute>,
+      },
+      {
+        path: "/tenderDropPage/:code",
+        element: <PrivetRoute><TenderDropperPage /></PrivetRoute>,
       },
       {
         path: "/register",

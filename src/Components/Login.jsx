@@ -4,24 +4,37 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import Pagetitle from './Pagetitle';
-import GoogleButton from './Share/GoogleButton';
 import useAuth from './Authntication/useAuth';
+import generateRandomString from './Utilits/bitCodeGenerat';
+import { useQuery } from '@tanstack/react-query';
 
 
 const Login = () => {
     const navigate = useNavigate()
     // data.preventDefault()
     const { loginEmail } = useAuth()
+    
+  
+    
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = data => {
         const email = data.email;
         const password = data.password;
-        console.log(email, password)
+        const bitCode = generateRandomString();
+        console.log(email, password, bitCode)
+       
         loginEmail(email, password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
+                console.log(user);
+                // const { data: userDataDB = [], refetch, isLoading } = useQuery(['userCode'], async () => {
+                //     const userCheck = await instance.get(`/singleUser/${user?.email}`);
+                //     console.log(userDataDB);
+                //     return userCheck.data
+                // })
+                
                 navigate('/')
                 // ...
             })
@@ -58,9 +71,9 @@ const Login = () => {
                     </Link>
                 </div>
                 <p>123@Aaaa</p>
-                <input className='btn btn-sm btn-success mt-2' type="submit" />
+                <p>ber: "dsdsds@gmail.com" </p>
+                <button className='btn btn-sm btn-success mt-2' type="submit">Login</button>
             </form>
-            <GoogleButton></GoogleButton>
         </div>
     );
 };

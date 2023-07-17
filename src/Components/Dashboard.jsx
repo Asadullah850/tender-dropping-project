@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Pagetitle from './Pagetitle';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 import useAuth from './Authntication/useAuth';
 import useAxios from './Share/useAxios';
 import LogOut from './Share/Logout';
-import axios from 'axios';
 
 
 
@@ -18,13 +17,20 @@ const Dashboard = () => {
     const [productName, setPName] = useState('');
     const [productPrice, setPPrice] = useState('');
     const [productData, setProductData] = useState('');
+    const [productCode, setProductCode] = useState('');
     const [sellNow, setSellNow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [seeProduct, setseeProduct] = useState(false);
-    const [roll, setRoll] = useState('bitStop')
+    const [roll, setRoll] = useState('bitStop');
+    const [autCode, SetAutCode] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+
     const navigate = useNavigate();
     const [instance] = useAxios();
+    const inputRef = useRef(null);
+
+
     const { user, logout, loading } = useAuth();
 
     function generateRandomString() {
@@ -32,69 +38,73 @@ const Dashboard = () => {
         var uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         var lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
         var numbers = '0123456789';
-      
-      
-        for (var j = 0; j < 8; j++) {
-          randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+
+
+        for (var j = 0; j < 2; j++) {
+            randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
         }
-      
-        for (var k = 0; k < 30; k++) {
-          randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+
+        for (var k = 0; k < 3; k++) {
+            randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
         }
-      
-        for (var l = 0; l < 8; l++) {
-          randomString += lowercaseLetters.charAt(Math.floor(Math.random() * lowercaseLetters.length));
+
+        for (var l = 0; l < 2; l++) {
+            randomString += lowercaseLetters.charAt(Math.floor(Math.random() * lowercaseLetters.length));
         }
-      
-        for (var m = 0; m < 10; m++) {
-          randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+
+        for (var m = 0; m < 3; m++) {
+            randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
         }
-      
+
         return randomString.trim();
-      }
+    }
 
     const { data: userDataDB = [], refetch, isLoading } = useQuery(['user'], async () => {
         const userCheck = await instance.get(`/singleUser/${user?.email}`);
         // console.log(userCheck);
         return userCheck.data
     })
-
-
-    const { companyname, email, idNumber, imgUrl, phoneNumber, role, name,_id } = userDataDB;
-
+    // SetAutCode(generateRandomString())
+    const { companyname, email, idNumber, imgUrl, bitCode, phoneNumber, role, name, _id } = userDataDB;
+    // console.log(userDataDB);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const onSubmit = data => {
+    const onSubmit = async (data) => {
         const product = data.ProductName
         const status = roll;
+        const UserCode = userDataDB.idNumber;
+        const email = user?.email
         const code = generateRandomString()
-        const checkCode = instance.get(`/checkCode/${code}`)
+        let checkCode = await instance.get(`/checkCode/${code}  `)
         console.log(checkCode);
-        if (checkCode === null) {
+        if (checkCode === null || " ") {
             checkCode = 0;
         }
         if (checkCode == code) {
             return code
         }
-        console.log(checkCode);
+        SetAutCode(code)
+        // console.log(checkCode);
         const price = parseFloat(data.price)
         const date = new Date()
         const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         if (price < 0) {
             return toast.warning(' price les den 0 not accepted')
         }
-        const setProduct = {
-            status, product, price, postDate, code
+        const collection = {
+            status, product, price, postDate, code, UserCode, email
         }
 
+        const response = await instance.post(`/bitProductData`, collection)
+        console.log(response);
+        setProductCode(code)
         setPName(product)
         setPPrice(price)
         setSellNow(false)
         setseeProduct(true)
-        setProductData(setProduct)
-        console.log(setProduct)
-
-
+        setProductData(collection)
+        console.log(collection)
     };
+    // console.log(productCode);
     // console.log(edit);
     const handelSellButton = () => {
 
@@ -108,17 +118,17 @@ const Dashboard = () => {
     const handelEditSubmit = (event) => {
         event.preventDefault()
         const form = event.target
-        const productName = form.ProductName.value;
-        const productPrice = form.price.value;
-        const date = new Date()
-        const status = "bitStart";
-        const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-        if (productPrice < 0) {
-            return toast.warning(' price les den 1 not accepted')
-        }
-        const updateProduct = {
-            productName, productPrice, postDate, status
-        }
+        // const productName = form.ProductName.value;
+        // const productPrice = form.price.value;
+        // const date = new Date()
+        // const status = "bitStart";
+        // const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        // if (productPrice < 0) {
+        //     return toast.warning(' price les den 1 not accepted')
+        // }
+        // const updateProduct = {
+        //     productName, productPrice, postDate, status, productCode
+        // }
 
         console.log(updateProduct);
         setPName(productName)
@@ -135,43 +145,45 @@ const Dashboard = () => {
         }).catch((error) => {
             // An error happened.
         });
-    }
+    };
 
-    
-    
-      
-    //   var randomString = generateRandomString();
-    //   console.log(randomString);
-
-    const bitOn = ()=> {
-        const pName = productName;
-        const pPrice = productPrice;
-        // To do user code
-        const code = userDataDB.idNumber;
-        const email = user.email;
+    const bitOn = async () => {
         const status = "bitStart";
-        // const randomCode = Math.floor(Math.random()*99999) + 10000;
-        // const randomCode = generateRandomString()
-        // const { data: productCode = [], refetch, isLoading } = useQuery(['code'], async () => {
-        //     const userCheck = await instance.get(`/`);
-        //     // console.log(userCheck);
-        //     return userCheck.data
-        // })
-        const collection = { pName, pPrice, code, email, status, randomCode}
+        console.log(productCode);
+        const collection = { status }
         console.log("collection", collection);
-        console.log(productData);
-    //    const response = await instance.post(`productName`,collection);
-    //    console.log(response)
-        
+        const statusPatch = await instance.patch(`/status/${productCode}`, { status })
+
+        //  const response = await instance.post(`/bitProductData`, collection)
+        //    console.log(statusPatch);
+
     }
     // const bitcode =  ()=>{
     //     const randomCode = Math.floor(Math.random()*99999) + 10000;
-    //     const codeData =  await instance.patch(`/codeUpdate/${_id}`, {randomCode})
+    // const codeData =  await instance.patch(`/codeUpdate/${_id}`, {randomCode})
     //     console.log(randomCode, codeData);
     //     setBitStart(true)
     //     setError('')
     // }
-
+    // Bayer Section
+    const codeInput = (event) => {
+        setSearchQuery(event.target.value);
+        console.log(searchQuery, "PP880oz328");
+        // console.log('bit start');
+    }
+    const letBitBtn = async () => {
+        console.log(searchQuery);
+        const product = await instance.get(`/singleProduct/${searchQuery}`);
+        console.log(product.data);
+        // const { data: singlePData = [], refetch, isLoading } = useQuery(['searchQuery'], async () => {
+        //     const product = await instance.get(`/singleProduct/${searchQuery}`);
+        //     console.log(product.data);
+        //     return product.data
+        // })
+    }
+    const connection = () => {
+        console.log('connection request');
+    }
     return (
         <div className=' text-center'>
             {
@@ -186,7 +198,7 @@ const Dashboard = () => {
                                 <img src={imgUrl} />
                             </div>
                         </div>
-{/* edit */}
+                        {/* edit */}
                         <div className=" mx-4 text-left">
                             {/* Open the modal using ID.showModal() method */}
                             <button className="btn btn-sm bg-transparent p-0 border-none hover:bg-transparent" onClick={() => window.my_modal_5.showModal()}><FaEdit className=' text-white text-lg '></FaEdit></button>
@@ -213,27 +225,38 @@ const Dashboard = () => {
                                     </div>
                                 </form>
                             </dialog>
-
-{/* edit */}
+                            {/* edit */}
                             <p>Company : {companyname}</p>
                             <p>Name: {name}</p>
                             <p>Phone: {phoneNumber}</p>
                             <p>Email: {email}</p>
-                            <p>Status: <span className=' uppercase'>{role}</span> / Code : 45458 </p>
+                            <p>Status: <span className=' uppercase'>{role}</span> / Code : {autCode} </p>
                             {/* to do akhane jwt wuse korty hobe */}
                         </div>
                     </div>
                     :
-                    <div className=" flex lg:w-[60%] w-[80%] justify-between mx-auto my-2">
-                        <div className="avatar">
-                            <div className="w-24 rounded-xl">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRarHLf-_lcG7s3YUKLSn6CdqR77v6C1SiZUXYq_vTQH3SwbkKCn956PcsLyuYuWGhzTME&usqp=CAU" />
+                    <div className="">
+                        <div className=" flex lg:w-[60%] w-[80%] justify-between mx-auto my-2">
+                            <div className="avatar">
+                                <div className="w-24 rounded-xl">
+                                    <img src={imgUrl} />
+                                </div>
+                            </div>
+                            <div className=" mx-4 text-left">
+                                <p>
+                                    {/* Company Name: <br />  */}
+                                    {companyname}</p>
+                                <p>
+                                    {/* Name: <br />  */}
+                                    {name}
+                                </p>
+                                <p>Status: {role}</p>
+                                <p>Code : {bitCode}</p>
                             </div>
                         </div>
-                        <div className=" mx-4 text-left">
-                            <p>Name: Jems Brone</p>
-                            <p>Status: Bayer</p>
-                            <p>Code : B5484</p>
+                        <div className="">
+                            <button onClick={connection} className='btn btn-secondary btn-sm'>Connection</button>
+                            <button onClick={singOut} className='btn btn-secondary btn-sm'>logOut</button>
                         </div>
                     </div>
             }
@@ -241,7 +264,7 @@ const Dashboard = () => {
                 role === 'seller' ?
                     // seller section 
                     <div className="mt-5">
-                        <button onClick={handelSellButton} className={ sellNow ? `btn btn-sm btn-info` : `btn btn-sm btn-info` }>
+                        <button onClick={handelSellButton} className={sellNow ? `btn btn-sm btn-info` : `btn btn-sm btn-info`}>
                             {
                                 sellNow ? 'Not now ' : 'Sell now'
                             }
@@ -254,8 +277,14 @@ const Dashboard = () => {
                         <button className="btn btn-sm btn-error mx-2">Help</button>
                     </div>
                     :
-
-                    <button className='btn btn-sm btn-secondary'>Lets Bit</button>
+                    <div className="w-[60%] mx-auto flex mt-5">
+                        <div className="form-control w-full ">
+                            <input type="text" placeholder="Type Bit Code" className="input input-bordered w-full h-8 text-black" onChange={codeInput} />
+                        </div>
+                        <Link to={`/tenderDropPage/${searchQuery}`}>
+                            <button onClick={letBitBtn} className='btn btn-sm btn-secondary mx-2 w-20'>Lets Bit</button>
+                        </Link>
+                    </div>
             }
             {/*  */}
             {
@@ -283,7 +312,7 @@ const Dashboard = () => {
                         )}
                     </form>
                     :
-                    edit  && editForm === false ?
+                    edit && editForm === false ?
                         <div className="overflow-x-auto lg:w-[60%] mx-auto mt-4">
                             <table className="table">
                                 {/* head */}
@@ -298,7 +327,7 @@ const Dashboard = () => {
                                         </td>
                                         <th>
                                             <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
-                                            <Link to={'/bitBoard'}>
+                                            <Link to={`/bitBoard/:${productCode}`}>
                                                 <button onClick={bitOn} className="btn btn-accent btn-xs">Bit Start</button>
                                             </Link>
                                         </th>
@@ -326,7 +355,7 @@ const Dashboard = () => {
                                     </td>
                                     <th>
                                         <button onClick={handelEdit} className="btn btn-info mx-2 btn-xs">Edit</button>
-                                        <Link to={'/bitBoard'}>
+                                        <Link to={`/bitBoard/${productCode}`}>
                                             <button onClick={bitOn} className="btn btn-accent btn-xs">Start</button>
                                         </Link>
                                     </th>
