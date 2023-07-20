@@ -64,9 +64,15 @@ const Dashboard = () => {
         // console.log(userCheck);
         return userCheck.data
     })
+
     // SetAutCode(generateRandomString())
     const { companyname, email, idNumber, imgUrl, bitCode, phoneNumber, role, name, _id } = userDataDB;
     // console.log(userDataDB);
+
+
+    
+
+
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = async (data) => {
         const product = data.ProductName
@@ -87,11 +93,13 @@ const Dashboard = () => {
         const price = parseFloat(data.price)
         const date = new Date()
         const postDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
         if (price < 0) {
             return toast.warning(' price les den 0 not accepted')
         }
         const collection = {
-            status, product, price, postDate, code, UserCode, email
+            status, product, price, postDate, code, UserCode, email, time
         }
 
         const response = await instance.post(`/bitProductData`, collection)
@@ -255,8 +263,8 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="">
-                            <button onClick={connection} className='btn btn-secondary btn-sm'>Connection</button>
-                            <button onClick={singOut} className='btn btn-secondary btn-sm'>logOut</button>
+                            <button onClick={connection} className='btn btn-secondary btn-sm'>Connect</button>
+                            <button onClick={singOut} className='btn btn-secondary btn-sm mx-2'>logOut</button>
                         </div>
                     </div>
             }
@@ -274,6 +282,7 @@ const Dashboard = () => {
                         </Link>
                         {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
                         <button onClick={() => singOut()} className='btn btn-sm btn-warning'>Logout</button>
+                        <button  className='btn btn-sm btn-warning'>test</button>
                         <button className="btn btn-sm btn-error mx-2">Help</button>
                     </div>
                     :
@@ -282,7 +291,7 @@ const Dashboard = () => {
                             <input type="text" placeholder="Type Bit Code" className="input input-bordered w-full h-8 text-black" onChange={codeInput} />
                         </div>
                         <Link to={`/tenderDropPage/${searchQuery}`}>
-                            <button onClick={letBitBtn} className='btn btn-sm btn-secondary mx-2 w-20'>Lets Bit</button>
+                            <button onClick={letBitBtn} className='btn btn-sm btn-secondary mx-2 w-[80px]'>Lets Bit</button>
                         </Link>
                     </div>
             }

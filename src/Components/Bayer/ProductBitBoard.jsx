@@ -1,55 +1,102 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import useAxios from '../Share/useAxios';
+import { toast } from 'react-toastify';
 
 const ProductBitBoard = () => {
     const [seconds, setSeconds] = useState(0);
-    const [minute, setMinute] = useState(0)
+    const [minute, setMinute] = useState(0);
+    const navigate = useNavigate();
     const params = useParams();
     const [instance] = useAxios();
 
 
+
     const pCode = params.bitBoard;
-    
+    // console.log("params", params, "pcode", pCode);
+
+    if (!pCode) {
+        <p>Loading pleas</p>
+    }
+
     // console.log(params.bitBoard);
-    const { data: singlePData = [], refetch, isLoading } = useQuery(['productCode'], async () => {
+    const { data: singlePData = [] } = useQuery(['productCode'], async () => {
         const product = await instance.get(`/singleProduct/${pCode}`);
         // console.log(product.data);
         return product.data
     })
-console.log(singlePData.product);
+    const { data: betData = [], isLoading } = useQuery(['betProduct'], async () => {
+        const bet = await instance.get(`/betProduct/${pCode}`);
+        console.log(bet.data);
+        return bet.data
+    })
+    // console.log(singlePData.product);
 
-    useEffect(() => {
-        if (minute <= 5) {
+    useEffect( () => {
+        if (minute <= 1) {
             const interval = setInterval(() => {
                 setSeconds((prevSeconds) => prevSeconds + 1);
                 if (seconds === 60) {
                     setSeconds(0)
+                    setMinute(minute + 1)
                 }
+
             }, 1000);
 
-            if (seconds === 60) {
-                setMinute(minute + 1)
-            }
-            if (minute === 5) {
+            if (minute === 1) {
                 clearInterval(interval);
+                patchTimeOut()
             }
-
             return () => clearInterval(interval);
         }
     }, [seconds]);
 
-    const handelLock = () => {
-        console.log('lock ');
-        setMinute(5)
-    }
-
-    const handelReset = () => {
-        console.log('lock ');
+    const handelRecall = () => {
         setSeconds(seconds * 0)
         setMinute(seconds * 0)
+        recallPatch();
+        window.location.reload();
     }
+    
+    const recallPatch = async () =>{
+        const lock = "Recall"
+        const statusPatch = await instance.patch(`/lock/${pCode}`, { lock });
+    }
+
+    const patchTimeOut = async () => {
+        console.log('patch ');
+        const lock = "timeOut";
+        const statusPatch = await instance.patch(`/lock/${pCode}`, { lock });
+        console.log(statusPatch);
+
+    }
+    const home = async () => {
+        console.log('Home ');
+        // const lock = "cancel";
+        // const statusPatch = await instance.patch(`/lock/${pCode}`, { lock });
+        // console.log(statusPatch);
+        navigate('/')
+
+    }
+    const sold = async () => {
+        console.log('sold ');
+        const lock = "sold";
+        const date = new Date();
+        const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        const statusPatch = await instance.patch(`/lock/${pCode}`, { lock });
+        // console.log(statusPatch);
+        const status = "sold";
+        const {code, bayerEmail, bitPrice, calling, sellerEmail} = betData[0];
+        console.log(code, bayerEmail, bitPrice, calling, time, sellerEmail);
+        const data = {
+            code, bayerEmail, bitPrice, calling, sellerEmail, time, status
+        }
+        const soldData = await instance.post(`/sold`, data );
+        // console.log( soldData );
+        navigate('/')
+    }
+
 
     return (
         <div className=' text-center'>
@@ -58,7 +105,7 @@ console.log(singlePData.product);
             <div className="my-4 ">
                 <p className=' text-right w-[80%]'>
                     {
-                        minute === 5 ? <button className='btn btn-sm btn-error mx-4 my-2'> Unsold</button> : <>0{minute}:{seconds}</>
+                        minute === 1 ? <button onClick={handelRecall} className='btn btn-sm btn-error mx-4 my-2'> Recall</button> : <>0{minute}:{seconds}</>
                     }
                 </p>
                 {/*  */}
@@ -72,40 +119,29 @@ console.log(singlePData.product);
                                 <th>TK</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <th>1</th>
-                                <td>Hart Hagerty</td>
-                                <td>2500</td>
-                            </tr>
-                            <tr>
-                                <th>2</th>
-                                <td>Hart Hagerty</td>
-                                <td>2400</td>
-                            </tr>
-                            <tr>
-                                <th>3</th>
-                                <td>Hart Hagerty</td>
-                                <td>2350</td>
-                            </tr>
-                        </tbody>
+                        {
+                            betData?.map((item, index) => (
+                                <tbody key={item._id}>
+                                    <tr>
+                                        <th>{index + 1}</th>
+                                        <td>{item.bayerEmail}</td>
+                                        <td>{item.bitPrice}</td>
+                                    </tr>
+                                </tbody>
+                            ))
+                        }
+
                     </table>
                 </div>
             </div>
             <div className="">
                 <div className="">
-                    <button onClick={handelLock} className='btn btn-sm btn-warning'> Lock</button>
-                    <button onClick={handelReset} className='btn btn-sm btn-success mx-4'> reset</button>
-                </div>
-                <div className="">
-
-                    <Link to={'/'}>
-                        <button className='btn btn-sm btn-success'> Sold</button>
-                    </Link>
+                        <button onClick={sold} className='btn btn-sm btn-success'> Sold</button>
                     {/* <button className='btn btn-sm btn-error mx-4 my-2'> Unsold</button> */}
                     <Link to={'/'}>
-                        <button className='btn btn-sm bg-green-500 my-2 mx-4'> Home</button>
+                        <button onClick={home} className='btn btn-sm bg-green-500 my-2 mx-4'> Home</button>
                     </Link>
+                    <button onClick={home} className='btn btn-sm btn-success'> Cancel</button>
                 </div>
             </div>
         </div>

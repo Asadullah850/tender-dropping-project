@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Pagetitle from '../Pagetitle';
@@ -8,11 +8,16 @@ import useAxios from '../Share/useAxios';
 import useAuth from '../Authntication/useAuth';
 import Lottie from "lottie-react";
 import winner from "../../../public/animation_winner.json";
+import fileLock from "../../../public/file-Lock.json";
 
 
 const TenderDropperPage = () => {
     const param = useParams()
-    const [bitData, setBitData] = useState({})
+    const [bitData, setBitData] = useState({});
+    const [seconds, setSeconds] = useState(0);
+    const [minute, setMinute] = useState(0);
+    const [updateWinner, setWinner] = useState(false);
+    const [lock, setLock] = useState(false);
     const { user, loading } = useAuth();
     const [instance] = useAxios();
     console.log(param.code);
@@ -34,29 +39,66 @@ const TenderDropperPage = () => {
     const { postDate, product, code, email } = singlePData
     // console.log(singlePData);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const onSubmit = data => {
-        const bitPrice = data.price;
+    const onSubmit = async (data) => {
+        const bitPrice = parseInt(data.price);
         const bayerEmail = user?.email;
         const sellerEmail = email;
         const code = param.code;
-        const date = postDate
+        const pDate = postDate;
+        const calling = "bet-Calling";
+        const date = new Date();
+        const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
         const allData = {
-            bitPrice, sellerEmail, code, date, bayerEmail
+            bitPrice, sellerEmail, code, pDate, bayerEmail, calling, time
         }
-        console.log('bitPrice :', allData)
+        // console.log('bitPrice :', allData)
         toast.success("Thanks For Call!", {
             position: toast.POSITION.TOP_CENTER
         });
         setBitData(allData)
+        setWinner(true)
+
+        const insert = await instance.post(`/call`, allData);
+        console.log(insert);
     };
     // console.log(bitData);
+
+    useEffect(() => {
+
+        if (minute <= 5) {
+            const interval = setInterval(() => {
+                setSeconds((prevSeconds) => prevSeconds + 1);
+                if (seconds === 60) {
+                    setSeconds(0)
+                }
+                refetch;
+            }, 1000);
+
+            if (seconds === 60) {
+                setMinute(minute + 1)
+            }
+            if (minute === 5) {
+                clearInterval(interval);
+                setLock(true)
+            }
+
+            return () => clearInterval(interval);
+        }
+    }, [seconds]);
+
     return (
         <div className=' text-center'>
             <Pagetitle title={'Tender Dropper Page'}></Pagetitle>
-            <p className='my-1' >Product Name: {product} | {code}</p>
+            <p className='my-1' >Product Name: <br /> {product} | {code} | 0{minute}:{seconds}</p>
             <Link to={'/'}>
                 <button className='btn btn-accent my-2'>Home</button>
             </Link>
+            {
+                lock ? 
+                <div className=" w-[60%] h-[60%] mx-auto">
+                    <Lottie animationData={fileLock} loop={true}  />
+                </div>  :
+            <div className="">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label htmlFor="">Price</label>
                 <input className='mx-2 p-2 rounded-lg text-black' type="text" placeholder="Product name" {...register("price", { required: true })} />
@@ -87,9 +129,16 @@ const TenderDropperPage = () => {
                     </table>
                 </div>
             </div>
-            <div className=" w-[60%] h-[60%] mx-auto">
-                <Lottie animationData={winner} loop={true}  />
+            {
+                updateWinner ? 
+                <div className=" w-[60%] h-[60%] mx-auto">
+                    <Lottie animationData={winner} loop={true}  />
+                </div>
+            : ''
+            }
             </div>
+            }
+            
         </div>
     );
 };
