@@ -32,6 +32,7 @@ const Dashboard = () => {
 
 
     const { user, logout, loading } = useAuth();
+    console.log(user.email);
 
     function generateRandomString() {
         var randomString = '';
@@ -66,7 +67,7 @@ const Dashboard = () => {
     })
     const { data: winnerData = [] } = useQuery(['winner'], async () => {
         const wine = await instance.get(`/sellerWinnerHistory/${user?.email}`);
-        console.log(winnerData);
+        // console.log(winnerData);
         return wine.data
     })
     const { data: winnerBayerData = [] } = useQuery(['winnerBayerData'], async () => {
@@ -405,7 +406,7 @@ const Dashboard = () => {
                     :
                     <div className=" lg:w-[60%] mx-auto mt-4">
                         <div className="overflow-x-auto">
-                            <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner</samp></p>
+                            <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner Bits</samp></p>
                             <table className="table">
                             <tbody>
                                 {
