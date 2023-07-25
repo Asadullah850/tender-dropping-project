@@ -64,13 +64,22 @@ const Dashboard = () => {
         // console.log(userCheck);
         return userCheck.data
     })
+    const { data: winnerData = [] } = useQuery(['winner'], async () => {
+        const wine = await instance.get(`/sellerWinnerHistory/${user?.email}`);
+        console.log(winnerData);
+        return wine.data
+    })
+    const { data: winnerBayerData = [] } = useQuery(['winnerBayerData'], async () => {
+        const wineBayer = await instance.get(`/bayerWinnerHistory/${user?.email}`);
+        console.log(winnerBayerData);
+        return wineBayer.data
+    })
 
     // SetAutCode(generateRandomString())
     const { companyname, email, idNumber, imgUrl, bitCode, phoneNumber, role, name, _id } = userDataDB;
     // console.log(userDataDB);
 
 
-    
 
 
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -176,7 +185,7 @@ const Dashboard = () => {
     // Bayer Section
     const codeInput = (event) => {
         setSearchQuery(event.target.value);
-        console.log(searchQuery, "PP880oz328");
+        console.log(searchQuery, "FK666rd393");
         // console.log('bit start');
     }
     const letBitBtn = async () => {
@@ -282,7 +291,6 @@ const Dashboard = () => {
                         </Link>
                         {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
                         <button onClick={() => singOut()} className='btn btn-sm btn-warning'>Logout</button>
-                        <button  className='btn btn-sm btn-warning'>test</button>
                         <button className="btn btn-sm btn-error mx-2">Help</button>
                     </div>
                     :
@@ -382,28 +390,14 @@ const Dashboard = () => {
                             <p className='text-xl font-semibold'>Last 3 Winner</p>
                             <hr />
                             <table className="table">
-                                <tbody>
-                                    {/* row 1 */}
-                                    <tr>
-                                        <th>1</th>
-                                        <td>Cy Export Shart</td>
-                                        <td>1500</td>
-                                        <td>betonaear</td>
-                                    </tr>
-                                    {/* row 2 */}
-                                    <tr>
-                                        <th>2</th>
-                                        <td>CXRy Export Shart</td>
-                                        <td>2200</td>
-                                        <td>Pelo</td>
-                                    </tr>
-                                    {/* row 3 */}
-                                    <tr>
-                                        <th>3</th>
-                                        <td>2RTY Export Shart</td>
-                                        <td>1000</td>
-                                        <td>Rambi</td>
-                                    </tr>
+                            <tbody>
+                                {
+                                    winnerData.map((items, index) => <tr key={items._id}>
+                                    <th>{items.soldDate}</th>
+                                    <td>{items.bayerEmail}</td>
+                                    <td>{items.bitPrice}tk</td>
+                                </tr>)
+                                }
                                 </tbody>
                             </table>
                         </div>
@@ -413,28 +407,14 @@ const Dashboard = () => {
                         <div className="overflow-x-auto">
                             <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner</samp></p>
                             <table className="table">
-                                <tbody>
-                                    {/* row 1 */}
-                                    <tr>
-                                        <th>1</th>
-                                        <td>Cy Export Shart</td>
-                                        <td>1500</td>
-
-                                    </tr>
-                                    {/* row 2 */}
-                                    <tr>
-                                        <th>2</th>
-                                        <td>CXRy Export Shart</td>
-                                        <td>2200</td>
-
-                                    </tr>
-                                    {/* row 3 */}
-                                    <tr>
-                                        <th>3</th>
-                                        <td>2RTY Export Shart</td>
-                                        <td>1000</td>
-
-                                    </tr>
+                            <tbody>
+                                {
+                                    winnerBayerData.map((items, index) => <tr key={items._id}>
+                                    <th>{items.soldDate}</th>
+                                    <td>{items.bayerEmail}</td>
+                                    <td>{items.bitPrice}tk</td>
+                                </tr>)
+                                }
                                 </tbody>
                             </table>
                         </div>

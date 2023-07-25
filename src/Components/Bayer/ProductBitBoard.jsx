@@ -84,16 +84,18 @@ const ProductBitBoard = () => {
         const lock = "sold";
         const date = new Date();
         const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        const soldDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         const statusPatch = await instance.patch(`/lock/${pCode}`, { lock });
         // console.log(statusPatch);
         const status = "sold";
         const {code, bayerEmail, bitPrice, calling, sellerEmail} = betData[0];
         console.log(code, bayerEmail, bitPrice, calling, time, sellerEmail);
         const data = {
-            code, bayerEmail, bitPrice, calling, sellerEmail, time, status
+            code, bayerEmail, bitPrice, calling, sellerEmail, time, status, soldDate
         }
         const soldData = await instance.post(`/sold`, data );
         // console.log( soldData );
+        // const product = await instance.delete(`/productDelete/${pCode}`);
         navigate('/')
     }
 
@@ -138,9 +140,9 @@ const ProductBitBoard = () => {
                 <div className="">
                         <button onClick={sold} className='btn btn-sm btn-success'> Sold</button>
                     {/* <button className='btn btn-sm btn-error mx-4 my-2'> Unsold</button> */}
-                    <Link to={'/'}>
+                    
                         <button onClick={home} className='btn btn-sm bg-green-500 my-2 mx-4'> Home</button>
-                    </Link>
+                   
                     <button onClick={home} className='btn btn-sm btn-success'> Cancel</button>
                 </div>
             </div>

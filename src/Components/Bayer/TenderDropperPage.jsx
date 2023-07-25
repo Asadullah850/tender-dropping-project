@@ -8,6 +8,7 @@ import useAxios from '../Share/useAxios';
 import useAuth from '../Authntication/useAuth';
 import Lottie from "lottie-react";
 import winner from "../../../public/animation_winner.json";
+import notWinner from "../../../public/sad.json";
 import fileLock from "../../../public/file-Lock.json";
 
 
@@ -16,11 +17,12 @@ const TenderDropperPage = () => {
     const [bitData, setBitData] = useState({});
     const [seconds, setSeconds] = useState(0);
     const [minute, setMinute] = useState(0);
-    const [updateWinner, setWinner] = useState(false);
-    const [lock, setLock] = useState(false);
+    const [updateStatus, setUpdateStatus] = useState('');
+    const [updateWinner, setWinner] = useState();
+    const [lock, setLock] = useState("call");
     const { user, loading } = useAuth();
     const [instance] = useAxios();
-    console.log(param.code);
+    // console.log(param.code);
     if (!param) {
         return <p> loading </p>
     }
@@ -35,6 +37,37 @@ const TenderDropperPage = () => {
     if (isLoading) {
         return <p> loading </p>
     }
+
+    const findSoldData = async () =>{
+        const product = await instance.get(`/checkWine/${param.code}`);
+        console.log("product.data", product.data[0].bayerEmail);
+        if ( product.data[0].bayerEmail == user?.email) {
+                console.log("bayerEmail",product.data[0].bayerEmail , "user.email", user.email);
+            setWinner(true)
+            setUpdateStatus(`Winner is ${product.data[0]?.bayerEmail}`)
+        }
+        if ( product.data[0].bayerEmail !== user?.email) {
+                console.log("bayerEmail",product.data[0].bayerEmail , "user.email", user.email);
+            setWinner(false)
+            setUpdateStatus(`Winner is ${product.data[0]?.bayerEmail}`)
+        }
+    }
+
+    function fetchData() {
+        fetch(`http://localhost:3000/singleProduct/${param.code}`)
+        .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            return response.json();
+          }).then(data => {
+            // console.log(data);
+
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      }
 
     const { postDate, product, code, email } = singlePData
     // console.log(singlePData);
@@ -56,12 +89,11 @@ const TenderDropperPage = () => {
             position: toast.POSITION.TOP_CENTER
         });
         setBitData(allData)
-        setWinner(true)
-
         const insert = await instance.post(`/call`, allData);
         console.log(insert);
     };
     // console.log(bitData);
+
 
     useEffect(() => {
 
@@ -71,15 +103,46 @@ const TenderDropperPage = () => {
                 if (seconds === 60) {
                     setSeconds(0)
                 }
-                refetch;
+
+                findSoldData()
+
+                fetch(`http://localhost:3000/singleProduct/${param.code}`)
+                .then(response => {
+                    if (!response.ok) {
+                      throw new Error('Network response was not ok.');
+                    }
+                    return response.json();
+                  }).then(data => {
+                    // console.log(data);
+                    const upStatus = data.status
+                    if (upStatus === "sold") {
+                        // setLock(data.bayerEmail)
+                        console.log("112 line",data.email);
+                    }
+                    console.log(lock);
+                    if (upStatus === "Recall") {
+                        setLock(upStatus)
+                    }
+                    if (upStatus === "timeOut" ) {
+                        setUpdateStatus(data.status)
+                        setLock(upStatus)
+                        refetch
+                        return clearInterval(interval)
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Error fetching data:', error);
+                  });
+
+               
             }, 1000);
 
             if (seconds === 60) {
                 setMinute(minute + 1)
             }
             if (minute === 5) {
-                clearInterval(interval);
-                setLock(true)
+                // clearInterval(interval);
+                setLock(updateStatus)
             }
 
             return () => clearInterval(interval);
@@ -93,11 +156,23 @@ const TenderDropperPage = () => {
             <Link to={'/'}>
                 <button className='btn btn-accent my-2'>Home</button>
             </Link>
+            <p>{updateStatus}</p>
             {
-                lock ? 
-                <div className=" w-[60%] h-[60%] mx-auto">
-                    <Lottie animationData={fileLock} loop={true}  />
-                </div>  :
+                lock === "timeOut" ?
+                <div className="w-[50%] mx-auto">
+                    <Lottie animationData={fileLock} loop={true}></Lottie>      
+                </div>
+                 : 
+                updateWinner === true ?
+                 <div className="w-[50%] mx-auto">
+                    <Lottie animationData={winner} loop={true}></Lottie>
+                </div>      
+                :
+                updateWinner === false ?
+                <div className="w-[50%] mx-auto">
+                    <Lottie animationData={notWinner} loop={true}></Lottie>
+                </div>   
+                :
             <div className="">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label htmlFor="">Price</label>
@@ -129,13 +204,6 @@ const TenderDropperPage = () => {
                     </table>
                 </div>
             </div>
-            {
-                updateWinner ? 
-                <div className=" w-[60%] h-[60%] mx-auto">
-                    <Lottie animationData={winner} loop={true}  />
-                </div>
-            : ''
-            }
             </div>
             }
             
