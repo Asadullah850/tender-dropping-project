@@ -7,7 +7,6 @@ import { FaEdit } from "react-icons/fa";
 import { useQuery } from '@tanstack/react-query';
 import useAuth from './Authntication/useAuth';
 import useAxios from './Share/useAxios';
-import LogOut from './Share/Logout';
 
 
 
@@ -72,7 +71,7 @@ const Dashboard = () => {
     })
     const { data: winnerBayerData = [] } = useQuery(['winnerBayerData'], async () => {
         const wineBayer = await instance.get(`/bayerWinnerHistory/${user?.email}`);
-        console.log(winnerBayerData);
+        // console.log(winnerBayerData);
         return wineBayer.data
     })
 
@@ -89,7 +88,7 @@ const Dashboard = () => {
         const status = roll;
         const UserCode = userDataDB.idNumber;
         const email = user?.email
-        const code = generateRandomString()
+        const code = bitCode
         let checkCode = await instance.get(`/checkCode/${code}  `)
         console.log(checkCode);
         if (checkCode === null || " ") {
@@ -155,15 +154,71 @@ const Dashboard = () => {
         setEdit(true)
         setEditForm(false)
     }
-    const singOut = () => {
-        logout().then((res) => {
+    const singOut = async () => {
+      
+        const generateRandomString = () => {
+            let randomString = '';
+            let uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+            let numbers = '0123456789';
+
+
+            for (let j = 0; j < 5; j++) {
+                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+            }
+
+            for (let k = 0; k < 5; k++) {
+                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+
+            for (let j = 0; j < 8; j++) {
+                randomString += lowercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+            }
+
+            for (let m = 0; m < 5; m++) {
+                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+
+            for (let j = 0; j < 5; j++) {
+                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+            }
+
+            for (let k = 0; k < 5; k++) {
+                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+
+            for (let j = 0; j < 8; j++) {
+                randomString += lowercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+            }
+
+            for (let m = 0; m < 5; m++) {
+                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+
+            for (let j = 0; j < 3; j++) {
+                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+            }
+
+            return randomString.trim();
+        }
+        const code = generateRandomString()
+        // console.log(code);
+
+          logout().then((res) => {
             // Sign-out successful.
+            logoutPatchCode(user?.email, code)
             navigate('/login')
             console.log(res);
         }).catch((error) => {
             // An error happened.
         });
+
     };
+
+    const logoutPatchCode = async ( data, code )=>{
+        const updateBitCode = await instance.patch(`/singleUser/${data}`, {code})
+        // console.log(code);
+    }
 
     const bitOn = async () => {
         const status = "bitStart";
@@ -248,7 +303,7 @@ const Dashboard = () => {
                             <p>Name: {name}</p>
                             <p>Phone: {phoneNumber}</p>
                             <p>Email: {email}</p>
-                            <p>Status: <span className=' uppercase'>{role}</span> / Code : {autCode} </p>
+                            <p>Status: <span className=' uppercase'>{role}</span> / Code : {bitCode} </p>
                             {/* to do akhane jwt wuse korty hobe */}
                         </div>
                     </div>
@@ -391,14 +446,14 @@ const Dashboard = () => {
                             <p className='text-xl font-semibold'>Last 3 Winner</p>
                             <hr />
                             <table className="table">
-                            <tbody>
-                                {
-                                    winnerData.map((items, index) => <tr key={items._id}>
-                                    <th>{items.soldDate}</th>
-                                    <td>{items.bayerEmail}</td>
-                                    <td>{items.bitPrice}tk</td>
-                                </tr>)
-                                }
+                                <tbody>
+                                    {
+                                        winnerData.map((items, index) => <tr key={items._id}>
+                                            <th>{items.soldDate}</th>
+                                            <td>{items.bayerEmail}</td>
+                                            <td>{items.bitPrice}tk</td>
+                                        </tr>)
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -408,14 +463,14 @@ const Dashboard = () => {
                         <div className="overflow-x-auto">
                             <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner Bits</samp></p>
                             <table className="table">
-                            <tbody>
-                                {
-                                    winnerBayerData.map((items, index) => <tr key={items._id}>
-                                    <th>{items.soldDate}</th>
-                                    <td>{items.bayerEmail}</td>
-                                    <td>{items.bitPrice}tk</td>
-                                </tr>)
-                                }
+                                <tbody>
+                                    {
+                                        winnerBayerData.map((items, index) => <tr key={items._id}>
+                                            <th>{items.soldDate}</th>
+                                            <td>{items.bayerEmail}</td>
+                                            <td>{items.bitPrice}tk</td>
+                                        </tr>)
+                                    }
                                 </tbody>
                             </table>
                         </div>

@@ -7,12 +7,14 @@ import Pagetitle from './Pagetitle';
 import useAuth from './Authntication/useAuth';
 import generateRandomString from './Utilits/bitCodeGenerat';
 import { useQuery } from '@tanstack/react-query';
+import useAxios from './Share/useAxios';
 
 
 const Login = () => {
-    const navigate = useNavigate()
+    const [instance] = useAxios();
+    const navigate = useNavigate();
     // data.preventDefault()
-    const { loginEmail } = useAuth()
+    const { loginEmail } = useAuth();
     
   
     
@@ -30,10 +32,11 @@ const Login = () => {
                 const user = userCredential.user;
                 console.log(user);
                 // const { data: userDataDB = [], refetch, isLoading } = useQuery(['userCode'], async () => {
-                //     const userCheck = await instance.get(`/singleUser/${user?.email}`);
+                //     const userCheck = await instance.patch(`/singleUser/${user?.email}`);
                 //     console.log(userDataDB);
                 //     return userCheck.data
                 // })
+                patch(user?.email)
                 
                 navigate('/')
                 // ...
@@ -44,6 +47,11 @@ const Login = () => {
             });
 
     };
+
+    const patch = async ( data )=>{
+        const code = generateRandomString()
+        const updateBitCode = await instance.patch(`/singleUser/${data}`, {code})
+    }
 
     return (
         <div className='text-center mx-10'>
