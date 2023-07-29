@@ -90,10 +90,23 @@ const TenderDropperPage = () => {
         });
         setBitData(allData)
         const insert = await instance.post(`/call`, allData);
-        console.log(insert);
+        // console.log(insert);
+        connection()
     };
-    // console.log(bitData);
 
+    const connection = async () => {
+        const myEmail = user.email;
+        const sellerEmail = email;
+        const findingConnection = await instance.get(`/connectionRequestFind/${myEmail}`)
+        const findData = findingConnection.data
+        const doesExist = findData.some((obj) => obj.sellerEmail === sellerEmail);
+        if (doesExist === true) {
+            return ;
+        }
+        const allEmail = { myEmail, sellerEmail}
+        console.log('connection request', allEmail, 'true or false', doesExist);
+        const product = await instance.post(`/connection`, allEmail);
+    }
 
     useEffect(() => {
 
@@ -191,6 +204,7 @@ const TenderDropperPage = () => {
                                 <th className='text-white'>Date</th>
                                 <th className='text-white'>Email</th>
                                 <th className='text-white'>Bit Price</th>
+                                
                             </tr>
                         </thead>
                         <tbody>

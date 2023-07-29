@@ -254,9 +254,7 @@ const Dashboard = () => {
         //     return product.data
         // })
     }
-    const connection = () => {
-        console.log('connection request');
-    }
+  
     return (
         <div className=' text-center'>
             {
@@ -328,7 +326,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="">
-                            <button onClick={connection} className='btn btn-secondary btn-sm'>Connect</button>
+                            
                             <button onClick={singOut} className='btn btn-secondary btn-sm mx-2'>logOut</button>
                         </div>
                     </div>
