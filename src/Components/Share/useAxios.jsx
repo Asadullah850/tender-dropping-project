@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const useAxios = () => {
     const instance = axios.create({
-        baseURL: `http://localhost:3000`
+        baseURL: `https://tender-jamal-server.vercel.app`
       });
 
     return [instance]
