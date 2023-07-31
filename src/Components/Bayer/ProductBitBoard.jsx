@@ -89,7 +89,7 @@ const ProductBitBoard = () => {
         // console.log(statusPatch);
         const status = "sold";
         const {code, bayerEmail, bitPrice, calling, sellerEmail} = betData[0];
-        console.log(code, bayerEmail, bitPrice, calling, time, sellerEmail);
+        // console.log(code, bayerEmail, bitPrice, calling, time, sellerEmail);
         const data = {
             code, bayerEmail, bitPrice, calling, sellerEmail, time, status, soldDate
         }

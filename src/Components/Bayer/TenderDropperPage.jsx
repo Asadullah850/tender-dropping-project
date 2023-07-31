@@ -30,7 +30,7 @@ const TenderDropperPage = () => {
     const { data: singlePData = [], refetch, isLoading } = useQuery(['searchQuery'], async () => {
         const product = await instance.get(`/singleProduct/${param.code}`);
         // console.log(product.data);
-        console.log(singlePData);
+        // console.log(singlePData);
         return product.data
     })
 
@@ -78,11 +78,12 @@ const TenderDropperPage = () => {
         const sellerEmail = email;
         const code = param.code;
         const pDate = postDate;
+        const productName = product;
         const calling = "bet-Calling";
         const date = new Date();
         const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
         const allData = {
-            bitPrice, sellerEmail, code, pDate, bayerEmail, calling, time
+            bitPrice, sellerEmail, code, pDate, bayerEmail, calling, time, productName
         }
         // console.log('bitPrice :', allData)
         toast.success("Thanks For Call!", {

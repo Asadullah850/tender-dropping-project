@@ -7,6 +7,7 @@ import { FaEdit } from "react-icons/fa";
 import { useQuery } from '@tanstack/react-query';
 import useAuth from './Authntication/useAuth';
 import useAxios from './Share/useAxios';
+import { FaCartArrowDown, FaHistory, FaUsers, FaUserCog, FaPhoneAlt } from "react-icons/fa";
 
 
 
@@ -31,7 +32,7 @@ const Dashboard = () => {
 
 
     const { user, logout, loading } = useAuth();
-    console.log(user.email);
+    // console.log(user.email);
 
     function generateRandomString() {
         var randomString = '';
@@ -39,29 +40,28 @@ const Dashboard = () => {
         var lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
         var numbers = '0123456789';
 
-
-        for (var j = 0; j < 2; j++) {
+        for (let j = 0; j < 1; j++) {
             randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-        }
-
-        for (var k = 0; k < 3; k++) {
+          }
+        
+          for (let k = 0; k < 2; k++) {
             randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-        }
-
-        for (var l = 0; l < 2; l++) {
-            randomString += lowercaseLetters.charAt(Math.floor(Math.random() * lowercaseLetters.length));
-        }
-
-        for (var m = 0; m < 3; m++) {
+          }
+      
+          for (let j = 0; j < 1; j++) {
+            randomString += lowercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
+          }
+      
+          for (let m = 0; m < 2; m++) {
             randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-        }
+          }
 
         return randomString.trim();
     }
 
     const { data: userDataDB = [], refetch, isLoading } = useQuery(['user'], async () => {
         const userCheck = await instance.get(`/singleUser/${user?.email}`);
-        // console.log(userCheck);
+        // console.log('userCheck',userCheck);
         return userCheck.data
     })
     const { data: winnerData = [] } = useQuery(['winner'], async () => {
@@ -75,12 +75,17 @@ const Dashboard = () => {
         return wineBayer.data
     })
 
+    const { data: productDataLast = [] } = useQuery(['productDataLast'], async () => {
+        const productData = await instance.get(`/productCodeLogout/${user?.email}`);
+        console.log("productDataLast80",productDataLast);
+        console.log("productDataLast81",productData);
+        return productData.data
+    })
+ 
+    
     // SetAutCode(generateRandomString())
     const { companyname, email, idNumber, imgUrl, bitCode, phoneNumber, role, name, _id } = userDataDB;
     // console.log(userDataDB);
-
-
-
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = async (data) => {
@@ -88,9 +93,10 @@ const Dashboard = () => {
         const status = roll;
         const UserCode = userDataDB.idNumber;
         const email = user?.email
-        const code = bitCode
+        const code = bitCode;
+        const sl = parseFloat(winnerData.length + 1);
         let checkCode = await instance.get(`/checkCode/${code}  `)
-        console.log(checkCode);
+        // console.log(checkCode);
         if (checkCode === null || " ") {
             checkCode = 0;
         }
@@ -108,7 +114,7 @@ const Dashboard = () => {
             return toast.warning(' price les den 0 not accepted')
         }
         const collection = {
-            status, product, price, postDate, code, UserCode, email, time
+            status, product, price, postDate, code, UserCode, email, time, sl
         }
 
         const response = await instance.post(`/bitProductData`, collection)
@@ -119,7 +125,7 @@ const Dashboard = () => {
         setSellNow(false)
         setseeProduct(true)
         setProductData(collection)
-        console.log(collection)
+        // console.log(collection)
     };
     // console.log(productCode);
     // console.log(edit);
@@ -147,7 +153,7 @@ const Dashboard = () => {
         //     productName, productPrice, postDate, status, productCode
         // }
 
-        console.log(updateProduct);
+        // console.log(updateProduct);
         setPName(productName)
         setPPrice(productPrice)
         setProductData(updateProduct)
@@ -155,84 +161,44 @@ const Dashboard = () => {
         setEditForm(false)
     }
     const singOut = async () => {
-      
-        const generateRandomString = () => {
-            let randomString = '';
-            let uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
-            let numbers = '0123456789';
-
-
-            for (let j = 0; j < 5; j++) {
-                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-            }
-
-            for (let k = 0; k < 5; k++) {
-                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-            }
-
-            for (let j = 0; j < 8; j++) {
-                randomString += lowercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-            }
-
-            for (let m = 0; m < 5; m++) {
-                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-            }
-
-            for (let j = 0; j < 5; j++) {
-                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-            }
-
-            for (let k = 0; k < 5; k++) {
-                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-            }
-
-            for (let j = 0; j < 8; j++) {
-                randomString += lowercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-            }
-
-            for (let m = 0; m < 5; m++) {
-                randomString += numbers.charAt(Math.floor(Math.random() * numbers.length));
-            }
-
-            for (let j = 0; j < 3; j++) {
-                randomString += uppercaseLetters.charAt(Math.floor(Math.random() * uppercaseLetters.length));
-            }
-
-            return randomString.trim();
-        }
         const code = generateRandomString()
         // console.log(code);
 
-          logout().then((res) => {
+        logout().then((res) => {
             // Sign-out successful.
-            logoutPatchCode(user?.email, code)
+            logoutPatchCode(user?.email, code);
+            logoutUpdateCode()
             navigate('/login')
-            console.log(res);
+            // console.log(res);
         }).catch((error) => {
             // An error happened.
         });
-
+        
     };
 
-    const logoutPatchCode = async ( data, code )=>{
-        const updateBitCode = await instance.patch(`/singleUser/${data}`, {code})
+    const logoutPatchCode = async (data, code) => {
+        const updateBitCode = await instance.patch(`/singleUser/${data}`, { code })
         // console.log(code);
+        
     }
+    
+    const logoutUpdateCode = async () => {
+        const productCode = productDataLast[0].code;
+        const updateCode = "APVEO8857688147LLROP6336asasasxxcrok556813SERGFFSCVWS"
 
+        if (role === "seller") {
+            const updateBitCode = await instance.patch(`/productCodeLogoutPatch/${productCode}`, { updateCode })
+        }
+    }
+    
     const bitOn = async () => {
         const status = "bitStart";
-        console.log(productCode);
         const collection = { status }
-        console.log("collection", collection);
         const statusPatch = await instance.patch(`/status/${productCode}`, { status })
-
-        //  const response = await instance.post(`/bitProductData`, collection)
-        //    console.log(statusPatch);
-
+        
     }
     // const bitcode =  ()=>{
-    //     const randomCode = Math.floor(Math.random()*99999) + 10000;
+        //     const randomCode = Math.floor(Math.random()*99999) + 10000;
     // const codeData =  await instance.patch(`/codeUpdate/${_id}`, {randomCode})
     //     console.log(randomCode, codeData);
     //     setBitStart(true)
@@ -241,20 +207,20 @@ const Dashboard = () => {
     // Bayer Section
     const codeInput = (event) => {
         setSearchQuery(event.target.value);
-        console.log(searchQuery, "FK666rd393");
+        // console.log(searchQuery, "FK666rd393");
         // console.log('bit start');
     }
     const letBitBtn = async () => {
         console.log(searchQuery);
         const product = await instance.get(`/singleProduct/${searchQuery}`);
-        console.log(product.data);
+        // console.log(product.data);
         // const { data: singlePData = [], refetch, isLoading } = useQuery(['searchQuery'], async () => {
         //     const product = await instance.get(`/singleProduct/${searchQuery}`);
         //     console.log(product.data);
         //     return product.data
         // })
     }
-  
+    
     return (
         <div className=' text-center'>
             {
@@ -264,43 +230,17 @@ const Dashboard = () => {
             {
                 role === 'seller' ?
                     <div className=" flex lg:w-[60%] w-[80%] justify-between mx-auto my-2">
-                        <div className="avatar">
-                            <div className="w-24 rounded-xl">
+                        <label tabIndex={0} className=" avatar">
+                            <div className="w-28 h-28 rounded-full">
                                 <img src={imgUrl} />
                             </div>
-                        </div>
+                        </label>
                         {/* edit */}
                         <div className=" mx-4 text-left">
-                            {/* Open the modal using ID.showModal() method */}
-                            <button className="btn btn-sm bg-transparent p-0 border-none hover:bg-transparent" onClick={() => window.my_modal_5.showModal()}><FaEdit className=' text-white text-lg '></FaEdit></button>
-                            <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
-                                <form method="dialog" className="modal-box">
-                                    <div className="flex justify-between">
-                                        <h3 className="font-bold text-lg">Edit!</h3>
-                                        <p>Code : {idNumber}</p>
-                                    </div>
-                                    <div className=" flex">
-                                        <div className="">
-                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={companyname} />
-                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="tel" defaultValue={phoneNumber} />
-                                        </div>
-                                        <div className="">
-                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={name} />
-                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="url" defaultValue={imgUrl} />
-                                        </div>
-                                    </div>
-                                    <div className="modal-action">
-                                        {/* if there is a button in form, it will close the modal */}
-                                        {/* To DO akhane edit button a kaj ace */}
-                                        <button className="btn border-2 border-black">Submit</button>
-                                    </div>
-                                </form>
-                            </dialog>
+                           
                             {/* edit */}
-                            <p>Company : {companyname}</p>
-                            <p>Name: {name}</p>
+                            <p>{companyname}</p>
                             <p>Phone: {phoneNumber}</p>
-                            <p>Email: {email}</p>
                             <p>Status: <span className=' uppercase'>{role}</span> / Code : {bitCode} </p>
                             {/* to do akhane jwt wuse korty hobe */}
                         </div>
@@ -326,7 +266,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="">
-                            
+
                             <button onClick={singOut} className='btn btn-secondary btn-sm mx-2'>logOut</button>
                         </div>
                     </div>
@@ -334,18 +274,64 @@ const Dashboard = () => {
             {
                 role === 'seller' ?
                     // seller section 
-                    <div className="mt-5">
-                        <button onClick={handelSellButton} className={sellNow ? `btn btn-sm btn-info` : `btn btn-sm btn-info`}>
+                    <div className="mt-5 grid grid-cols-2 gap-4">
+                        <div onClick={handelSellButton} className={sellNow ? ` bg-blue-600 text-5xl font-bold p-2 rounded-md ` : ` bg-blue-600 text-5xl font-bold p-2 rounded-md  cursor-pointer`}>
+                            <FaCartArrowDown className='mx-auto my-2 '></FaCartArrowDown>
                             {
                                 sellNow ? 'Not now ' : 'Sell now'
                             }
-                        </button>
+                        </div>
                         <Link to={'/sellerreport'}>
-                            <button className="mx-2 btn-sm  btn btn-success">Report</button>
+                            <div className="cursor-pointer mx-1 bg-blue-600 text-5xl font-bold p-2 rounded-md">
+                                <FaHistory className='mx-auto my-2 '></FaHistory>
+                                <div className="">Report</div>
+                            </div>
+
                         </Link>
-                        {/* <button className="btn  max-sm:btn-sm btn-warning">Warning</button> */}
-                        <button onClick={() => singOut()} className='btn btn-sm btn-warning'>Logout</button>
-                        <button className="btn btn-sm btn-error mx-2">Help</button>
+                        <div className="cursor-pointer mx-1 bg-blue-600 text-5xl font-bold p-2 rounded-md">
+                            <FaUsers className='mx-auto my-2 '></FaUsers>
+                            <div className="">Customer</div>
+                        </div>
+                        <div className="cursor-pointer mx-1 bg-blue-600 text-5xl font-bold p-2 rounded-md" onClick={() => window.my_modal_5.showModal()}>
+                            
+                             {/* Open the modal using ID.showModal() method */}
+                             <FaUserCog className='mx-auto my-2 '></FaUserCog>
+                            <div className="">Profile</div>
+                              
+                            <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+                                <form method="dialog" className="modal-box text-base">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-bold text-lg">Edit!</h3>
+                                        <p>Code : {idNumber}</p>
+                                    </div>
+                                    <div className=" flex">
+                                        <div className="">
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={companyname} />
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="tel" defaultValue={phoneNumber} />
+                                        </div>
+                                        <div className="">
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="text" defaultValue={name} />
+                                            <input className='border-2 border-violet-950 p-1 m-1 rounded-md' type="url" defaultValue={imgUrl} />
+                                        </div>
+                                    </div>
+                                    <div className="modal-action">
+                                        {/* if there is a button in form, it will close the modal */}
+                                        {/* To DO akhane edit button a kaj ace */}
+                                        <button className="btn border-2 border-black">Submit</button>
+                                    </div>
+                                </form>
+                            </dialog>
+
+                        </div>
+                        {/* <div className="btn  max-sm:btn-sm btn-warning">Warning</div> */}
+                        <div onClick={() => singOut()}  className="cursor-pointer mx-1 bg-blue-600 text-5xl font-bold p-2 rounded-md">
+                            <FaHistory className='mx-auto my-2 '></FaHistory>
+                            <div className="">Logout</div>
+                        </div>
+                        <div className="cursor-pointer mx-1 bg-blue-600 text-5xl font-bold p-2 rounded-md">
+                            <FaPhoneAlt className='mx-auto my-2 '></FaPhoneAlt>
+                            <div className="">Help</div>
+                        </div>
                     </div>
                     :
                     <div className="w-[60%] mx-auto flex mt-5">
@@ -439,24 +425,27 @@ const Dashboard = () => {
             }
             {
                 role === 'seller' ?
-                    <div className=" lg:w-[60%] mx-auto mt-4">
-                        <div className="overflow-x-auto">
-                            <p className='text-xl font-semibold'>Last 3 Winner</p>
-                            <hr />
-                            <table className="table">
-                                <tbody>
-                                    {
-                                        winnerData.map((items, index) => <tr key={items._id}>
-                                            <th>{items.soldDate}</th>
-                                            <td>{items.bayerEmail}</td>
-                                            <td>{items.bitPrice}tk</td>
-                                        </tr>)
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    // Note ata last 3 ta dekhai to doka matro
+                    // <div className=" lg:w-[60%] mx-auto mt-4">
+                    //     <div className="overflow-x-auto">
+                    //         <p className='text-xl font-semibold'>Last 3 Winner</p>
+                    //         <hr />
+                    //         <table className="table">
+                    //             <tbody>
+                    //                 {
+                    //                     winnerData.map((items, index) => <tr key={items._id}>
+                    //                         <th>{items.soldDate}</th>
+                    //                         <td>{items.bayerEmail}</td>
+                    //                         <td>{items.bitPrice}tk</td>
+                    //                     </tr>)
+                    //                 }
+                    //             </tbody>
+                    //         </table>
+                    //     </div>
+                    // </div>
+                    ""
                     :
+
                     <div className=" lg:w-[60%] mx-auto mt-4">
                         <div className="overflow-x-auto">
                             <p className='text-xl font-semibold '>Last 3 <samp className='underline'>Winner Bits</samp></p>
